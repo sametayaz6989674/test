@@ -6,9 +6,6 @@ from gtts import gTTS
 import io 
 import time
 import google.genai.errors 
-# Yeni import: İkonları emoji ile değiştirdiğimiz için base64'e artık ihtiyacımız yok.
-# Onun yerine daha stabil bir modül kullanmıyoruz, sadece mevcut kod temizlendi.
-
 
 # --- 1. ÖZEL BİLGİ KAYNAĞI (MYO Data) ---
 # Bilgileriniz aynen korunmuştur.
@@ -199,10 +196,10 @@ col1, col2 = st.columns([1, 6])
 
 with col1:
     try:
-        # LOGO GÖRSELİNİN ADI DOĞRU OLMALI
-        st.image("myo_logo.png", width=70) 
+        # LOGO GÖRSELİNİN ADI BURADA KULLANILDI (BALIKESİR ÜNİVERSİTESİ LOGOSU)
+        st.image("balikesir_uni_icon.png", width=70) 
     except FileNotFoundError:
-        st.info("Logo dosyası (myo_logo.png) bulunamadı. Lütfen GitHub'a yükleyin.")
+        st.info("Logo dosyası (balikesir_uni_icon.png) bulunamadı. Lütfen GitHub'a yükleyin.")
         st.header("🎓") 
 
 with col2:
@@ -215,7 +212,7 @@ with col2:
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"], 
                          # İkonlar artık buradan kontrol ediliyor!
-                         avatar="🧑‍🎓" if message["role"] == "user" else "🏛️"): 
+                         avatar="🧑‍🎓" if message["role"] == "user" else "balikesir_uni_icon.png"): 
         st.markdown(message["content"])
 
         # Sadece asistan mesajlarında ses butonu göster
@@ -276,7 +273,7 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
             bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
 
     # Bot cevabını ekrana yaz
-    with st.chat_message("assistant", avatar="🏛️"): # İkon buradan kontrol ediliyor
+    with st.chat_message("assistant", avatar="balikesir_uni_icon.png"): # İkon buradan kontrol ediliyor
         st.markdown(bot_response)
         
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
