@@ -234,11 +234,15 @@ if st.session_state.temp_mic_prompt:
     prompt = st.session_state.temp_mic_prompt
     st.session_state.temp_mic_prompt = None # Tekrar kullanmaması için sıfırla
 
+# Sohbet girişini bir container içine alarak mikrofon butonuyla yan yana getirme
+# Bunun için st.chat_input'un varsayılan davranışını değiştiremeyiz.
+# Bu yüzden, mikrofonu ayrı bir satırda tutmaya devam ediyoruz (daha stabil)
 with st.container():
     st.write("---") 
     st.markdown("##### 🎙️ Veya Sesli Sorun")
     
     # mic_recorder bileşeni
+    # NOTE: Key'i 'mic_recorder' olarak kullanmak zorunludur, çünkü callback onu kullanır
     mic_recorder(
         start_prompt="🔴 Kaydı Başlat", 
         stop_prompt="⏹️ Kaydı Durdur ve Metne Çevir", 
