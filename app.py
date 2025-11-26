@@ -6,19 +6,19 @@ from gtts import gTTS
 import io 
 import time
 import google.genai.errors 
+# YENİ EKLENEN KÜTÜPHANE: Sesli giriş için
+from streamlit_mic_recorder import mic_recorder 
 
 # --- 0. UYGULAMA GENEL AYARLARI (FAVICON VE SAYFA ADI) ---
-# Tarayıcı sekmesindeki ikon, sayfa başlığı ve EKRAN GENİŞLİĞİ ayarlanır.
 st.set_page_config(
     page_title="Altınoluk MYO Asistanı", 
     page_icon="balikesir_uni_icon.png", 
-    layout="centered" # <<<<<< Dar, ortalanmış ekran modu
+    layout="centered" # Dar, ortalanmış ekran modu
 )
 # --- 0. UYGULAMA GENEL AYARLARI BİTİŞ ---
 
 
 # --- 1. ÖZEL BİLGİ KAYNAĞI (MYO Data) ---
-# Bilgileriniz aynen korunmuştur.
 MYO_BILGI_KAYNAGI = """
 ### ALTINOLUK MESLEK YÜKSEKOKULU BİLGİ BANKASI ###
 * **Bölümler:** Altınoluk MYO'da toplam **3 bölüm** bulunmaktadır: Bilgisayar Programcılığı, Bitkisel ve Hayvansal Üretim Bölümü, ve Kimya ve Kimyasal İşleme Teknolojileri Bölümü.
@@ -51,38 +51,33 @@ def generate_audio(text):
         mp3_fp.seek(0)
         return mp3_fp.read()
     except Exception as e:
+        st.warning(f"Ses oluşturulamadı: {e}")
         return None
 
 def handle_special_query(client, prompt, model_name, myo_kaynagi, messages):
     """Kullanıcının isteği özetleme veya normal sohbet ise ayırır. Son cevabı özetlemeye öncelik verir."""
     
-    # 1. Adım: İsteğin türünü sınıflandırma (SADECE ÖZETLEME KONTROL EDİLİYOR)
     classification_prompt = (
         "Kullanıcının isteği sadece 'özetleme' mi ('bilgileri özetle', 'kısalt' vb.)? Eğer öyleyse SADECE 'OZETLE' kelimesini döndür. "
         "Aksi halde SADECE 'NORMAL' kelimesini döndür. "
         f"Kullanıcı İsteği: '{prompt}'"
     )
     
-    # Sınıflandırma isteği için API çağrısı
     classification_response = client.models.generate_content(
         model=model_name,
         contents=classification_prompt
     ).text.strip().upper()
     
     if "OZETLE" in classification_response:
-        # ÖZETLEME GÖREVİ
-        
         last_bot_response = ""
         if len(messages) >= 2 and messages[-2]["role"] == "assistant":
             last_bot_response = messages[-2]["content"]
         
-        # Son cevabın özetlenmeye değer uzunlukta olup olmadığını kontrol et (50 karakterden uzun olmalı)
         if last_bot_response and len(last_bot_response.replace('#', '').replace('*', '')) > 50:
             ozet_prompt = (
                 f"Kullanıcı, ona verdiğin son cevabı özetlemeni istiyor. Aşağıdaki metni, anlamını koruyarak 3-4 madde halinde akıcı ve anlaşılır bir dille kısaca özetle: \n\nMETİN: {last_bot_response}"
             )
         else:
-            # Geçmişte özetlenecek bir metin yoksa (veya çok kısaysa), genel MYO bilgisini özetle.
             ozet_prompt = (
                 f"Kullanıcı Altınoluk Meslek Yüksekokulu hakkında genel bir özet istedi. Aşağıdaki Altınoluk MYO Bilgi Kaynağı'nı, bir öğrenci adayının anlayabileceği şekilde, en kritik 4 ana başlıkta özetle."
                 f"\n\nKAYNAK METİN:\n{myo_kaynagi}"
@@ -110,24 +105,17 @@ SYSTEM_INSTRUCTION = (
 
 if "client" not in st.session_state:
     try:
-        # API Anahtarını Streamlit secrets yapısından çekiyoruz.
-        # Bu anahtarın Streamlit Cloud'da "GEMINI_API_KEY" olarak tanımlı olması gerekir.
         API_KEY_VALUE = st.secrets["GEMINI_API_KEY"] 
-        
-        # İstemciyi sadece bir kez oluştur ve Session State'e kaydet
         st.session_state.client = genai.Client(api_key=API_KEY_VALUE) 
-        
     except KeyError:
-        st.error("🚨 KRİTİK HATA: API Anahtarı Streamlit Secrets'ta tanımlı değil.")
+        st.error("🚨 KRİTİK HATA: API Anahtarı Streamlit Secrets'ta 'GEMINI_API_KEY' adıyla tanımlı değil.")
         st.warning("Lütfen Streamlit Cloud 'Secrets' ayarlarınıza 'GEMINI_API_KEY' adıyla yeni anahtarınızı ekleyin.")
         st.stop()
-        
     except Exception as e:
         st.error(f"API istemcisini başlatırken beklenmeyen hata: {e}")
         st.warning("Lütfen API anahtarınızın geçerliliğini kontrol edin.")
         st.stop()
 
-# Kodu daha kısa tutmak için client değişkenini Session State'ten çek
 client = st.session_state.client
 
 # Session state'i ilk kez başlatma
@@ -137,68 +125,54 @@ if "model_name" not in st.session_state:
     if "history" not in st.session_state:
         st.session_state.history = []
 
-# Butonun basılıp basılmadığını kontrol etmek için state
+# Ses butonu state'leri
 if "last_response_index" not in st.session_state:
     st.session_state.last_response_index = -1
 if "audio_button_pressed" not in st.session_state:
     st.session_state.audio_button_pressed = False
-
+# Sesli dinle butonu tıklandığında state'i güncelleyen fonksiyon
+def set_audio_state(index):
+    st.session_state.audio_button_pressed = True
+    st.session_state.last_response_index = index
 
 # --- 4. STREAMLIT ARYÜZÜ VE KURUMSAL CSS STİLİ ---
 
-# 4.1. Global CSS Stilleri (İkonları ve Baloncukları Düzeltme)
+# 4.1. Global CSS Stilleri
 st.markdown("""
 <style>
-/* Sol üstteki menü ve Streamlit yazısını gizler (config.toml işe yaramazsa zorla gizler) */
+/* Sol üstteki menü ve Streamlit yazısını gizler */
 .css-1jc2h0i { visibility: hidden; }
 
 /* ------------------------------------------------------------- */
-/* MESSAGES (Sohbet Baloncuğu) KİŞİSELLEŞTİRMESİ (Arka Plan ve Çerçeve) */
+/* MESSAGES (Sohbet Baloncuğu) KİŞİSELLEŞTİRMESİ */
 /* ------------------------------------------------------------- */
-
-/* USER (Kullanıcı) Mesaj Baloncuğu Arka Plan Rengi */
 .stChatMessage:nth-child(odd) { 
-    background-color: #FFFFFF !important; /* Kullanıcı için Beyaz Arka Plan */
-    border-left: 5px solid #003366; /* Kurumsal Mavi Çizgi */
+    background-color: #FFFFFF !important; 
+    border-left: 5px solid #003366; 
     border-radius: 0.5rem;
     padding: 10px;
     margin-bottom: 10px;
 }
-
-/* ASSISTANT (Asistan) Mesaj Baloncuğu Arka Plan Rengi */
 .stChatMessage:nth-child(even) { 
-    background-color: #E0EFFF !important; /* Asistan için Kurumsal Açık Mavi */
-    border-left: 5px solid #003366; /* Kurumsal Mavi Çizgi */
+    background-color: #E0EFFF !important; 
+    border-left: 5px solid #003366; 
     border-radius: 0.5rem;
     padding: 10px;
     margin-bottom: 10px;
 }
-
-/* ------------------------------------------------------------- */
-/* İKON DEĞİŞTİRME - STREAMLIT'İN AVATAR RENKLERİNİ DÜZELTME */
-/* ------------------------------------------------------------- */
-
-/* Kullanıcı İkonu Arka Plan Rengi (Varsayılan Kırmızıdan Gri/Nötr'e) */
 .stChatMessage [data-testid="stChatMessageAvatar-user"] {
-    background-color: #708090 !important; /* Gri ton */
+    background-color: #708090 !important; 
 }
-
-/* Asistan İkonu Arka Plan Rengi (Varsayılan Turuncudan Kurumsal Maviye) */
 .stChatMessage [data-testid="stChatMessageAvatar-assistant"] {
-    background-color: #003366 !important; /* Koyu Kurumsal Mavi */
+    background-color: #003366 !important; 
 }
-
-/* ------------------------------------------------------------- */
-/* ALT DOKUNUŞLAR (User tarafından istendi) */
-/* ------------------------------------------------------------- */
-.css-1v0609 { /* st.container (genişlik) stilini değiştirir */
-    box-shadow: 0 4px 8px rgba(0, 51, 102, 0.2); /* Kurumsal Mavi Hafif Gölge */
+.css-1v0609 { 
+    box-shadow: 0 4px 8px rgba(0, 51, 102, 0.2); 
     border-radius: 12px;
 }
-.stButton>button { /* Sesli dinle butonlarına hafif gölge ekler */
+.stButton>button { 
     box-shadow: 0 2px 4px rgba(0, 51, 102, 0.1); 
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -208,10 +182,9 @@ col1, col2 = st.columns([1, 6])
 
 with col1:
     try:
-        # BAŞLIK LOGOSU: Balıkesir Üniversitesi
         st.image("balikesir_uni_icon.png", width=70) 
     except FileNotFoundError:
-        st.info("Logo dosyası (balikesir_uni_icon.png) bulunamadı. Lütfen GitHub'a yükleyin.")
+        st.info("Logo dosyası bulunamadı.")
         st.header("🎓") 
 
 with col2:
@@ -223,48 +196,73 @@ with col2:
 # Geçmiş mesajları görüntüle
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"], 
-                         # İKONLAR: Kullanıcı -> student_icon.png, Asistan -> balikesir_uni_icon.png
                          avatar="student_icon.png" if message["role"] == "user" else "balikesir_uni_icon.png"): 
         st.markdown(message["content"])
 
-        # Sadece asistan mesajlarında ses butonu göster
         if message["role"] == "assistant":
-             # Eğer bu mesaj, en son gelen ve butona basılan mesaj ise sesi oynat
             if st.session_state.audio_button_pressed and st.session_state.last_response_index == i:
                 audio_data = generate_audio(message["content"])
                 if audio_data:
                     st.audio(audio_data, format="audio/mp3")
-                else:
-                    st.warning("Ses dosyası oluşturulamadı.")
-            
-            # Sesli dinle butonu eklenir 
-            if st.button("🔊 Sesli Dinle", key=f"play_audio_{i}", on_click=lambda index=i: [setattr(st.session_state, 'audio_button_pressed', True), setattr(st.session_state, 'last_response_index', index)]):
+                
+            if st.button("🔊 Sesli Dinle", key=f"play_audio_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-
-# Kullanıcı girişi
-if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?"):
+# Kullanıcı girişi bölümü
+with st.container():
+    st.write("---") # Yatay çizgi ekle
+    # 5. YENİ BÖLÜM: MİKROFONDAN SES ALMA İŞLEMİ
+    st.markdown("##### 🎙️ Veya Sesli Sorun")
     
-    # Yeni mesaj geldiğinde ses butonu durumunu sıfırla
+    # mic_recorder bileşeni
+    # start_prompt: Kayıt başlatıldığında görünen metin
+    # stop_prompt: Kayıt durdurulduğunda görünen metin
+    # just_once: Kayıt sadece bir kez alınır
+    # use_streamlit_native_buttons: Streamlit'in kendi butonlarını kullanır (Görsel tutarlılık sağlar)
+    mic_result = mic_recorder(
+        start_prompt="🔴 Kaydı Başlat", 
+        stop_prompt="⏹️ Kaydı Durdur ve Metne Çevir", 
+        key='mic_recorder',
+        use_streamlit_native_buttons=True
+    )
+    
+    # mic_recorder'dan metin gelip gelmediğini kontrol et
+    voice_input = ""
+    if mic_result and mic_result.get('text'):
+        voice_input = mic_result['text']
+        # Kaydı aldıktan sonra otomatik olarak metin kutusuna doldur
+        # Streamlit'te doğrudan st.chat_input'a değer atanamadığı için,
+        # bu değeri session_state'e atayıp bir sonraki rerunda kullanacağız.
+        st.session_state.voice_prompt = voice_input
+
+    # 6. KLASİK YAZILI GİRİŞ
+    # Sesli giriş varsa, onu metin girişine aktar
+    if 'voice_prompt' in st.session_state and st.session_state.voice_prompt:
+        prompt = st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?", value=st.session_state.voice_prompt)
+        # Session state'i sıfırla ki, kullanıcı kendisi yazmaya devam edebilsin
+        del st.session_state.voice_prompt
+    else:
+        prompt = st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
+
+
+# KLASİK GİRİŞ VEYA SESLİ GİRİŞ İLE İŞLEM BAŞLATMA
+if prompt:
+    
     st.session_state.audio_button_pressed = False
     st.session_state.last_response_index = -1
     
-    # Kullanıcı mesajını ekrana yaz ve messages listesine ekle
-    with st.chat_message("user", avatar="student_icon.png"): # İKON: student_icon.png
+    with st.chat_message("user", avatar="student_icon.png"): 
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # ÖZEL İŞLEM KONTROLÜ (Sadece Özetleme)
     special_content, is_special = handle_special_query(client, prompt, st.session_state.model_name, MYO_BILGI_KAYNAGI, st.session_state.messages)
 
     with st.spinner("Asistan düşünüyor..."):
         bot_response = ""
         try:
             if is_special:
-                # Özel görev ise (özetleme), sonucu direkt kullan
                 bot_response = special_content
             else:
-                # Normal sohbet ise, sohbet objesini yeniden oluştur ve mesaj gönder
                 current_chat = client.chats.create(
                     model=st.session_state.model_name, 
                     history=st.session_state.history,
@@ -277,18 +275,13 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
                 st.session_state.history = current_chat.get_history()
 
         except google.genai.errors.ServerError as e:
-            # API aşırı yükleme hatalarını (503) yakalar
             bot_response = f"**⚠️ Üzgünüm, API çok yoğun!** Lütfen 10 saniye bekleyip tekrar deneyin. ({e.status_code})"
-
         except Exception as e:
-            # Diğer tüm hataları yakalar
             bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
 
-    # Bot cevabını ekrana yaz
-    with st.chat_message("assistant", avatar="balikesir_uni_icon.png"): # İKON: balikesir_uni_icon.png
+    with st.chat_message("assistant", avatar="balikesir_uni_icon.png"): 
         st.markdown(bot_response)
         
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
-    # Sayfanın tekrar çizilmesini sağlamak için
     st.rerun()
