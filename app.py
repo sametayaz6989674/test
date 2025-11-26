@@ -9,7 +9,7 @@ import google.genai.errors
 
 # DİKKAT: API anahtarı, test amaçlı olarak direkt koda GÖMÜLMÜŞTÜR.
 # LÜTFEN KENDİ YENİ ANAHTARINIZI BURAYA YAZINIZ.
-MY_API_KEY = "AIzaSyBBYPrGp5OhE_rRsqT2WLUS0aaPdFlBHIw" 
+MY_API_KEY = "" 
 
 # --- 1. ÖZEL BİLGİ KAYNAĞI (MYO Data) ---
 MYO_BILGI_KAYNAGI = """
@@ -201,4 +201,5 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     # Sayfanın tekrar çizilmesini sağlamak için
+
     st.rerun()
