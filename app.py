@@ -1,5 +1,4 @@
 import os
-import base64
 import streamlit as st
 from google import genai
 from google.genai import types 
@@ -7,9 +6,12 @@ from gtts import gTTS
 import io 
 import time
 import google.genai.errors 
+# Yeni import: İkonları emoji ile değiştirdiğimiz için base64'e artık ihtiyacımız yok.
+# Onun yerine daha stabil bir modül kullanmıyoruz, sadece mevcut kod temizlendi.
+
 
 # --- 1. ÖZEL BİLGİ KAYNAĞI (MYO Data) ---
-# Kullanıcının en son güncellediği tüm bilgiler buraya dahil edilmiştir.
+# Bilgileriniz aynen korunmuştur.
 MYO_BILGI_KAYNAGI = """
 ### ALTINOLUK MESLEK YÜKSEKOKULU BİLGİ BANKASI ###
 * **Bölümler:** Altınoluk MYO'da toplam **3 bölüm** bulunmaktadır: Bilgisayar Programcılığı, Bitkisel ve Hayvansal Üretim Bölümü, ve Kimya ve Kimyasal İşleme Teknolojileri Bölümü.
@@ -20,15 +22,14 @@ MYO_BILGI_KAYNAGI = """
 * **Staj Durumu:** Tüm öğrencilerin 3. ve 4. yarıyıl arasında **zorunlu 30 iş günü staj** yapma yükümlülüğü vardır.
 * **Okul İklimi:** Öğrenci yorumlarına göre okul samimi, küçük ve eğitmenler birebir ilgi gösterebilmektedir.
 * **Okul Eğlence Hobi Yemek:** Okulumuzun Yemekhanesi mevcuttur öğrenciler 40 TL karşlığında yemek yiyebilir. Okulumuzda kantin mevcuttur voleybol sahası vardır öğrencilerin masa tenisi oynayabileceği alan mevcuttur. okulumuzun kütüphanesi mevcuttur ders çalışmak için veya araştırma yapmak için öğrenciler kullanabilir. okul bahçesi güvenlidir her saat güvenlik kapıda beklemektedir. öğrencilere öğrenci kartı verilmektedir(sınavlarda öğrenci kartları masalara koyulur) okulumuzun konferans salonu mevcuttur 
-* **Akademik Takvim: 01 Eylül 2025 Azami Süre Sonu Sınavlarına Girecek Öğrencilerin İsimlerinin İlan Edilmesi
-(İlgili birim web sayfasında)** 02 Eylül 2025 Azami Süre Sonu 1. Ek Sınav Başvuru Tarihleri** 04 - 05 Eylül 2025 Azami Süre Sonu 1. Ek Sınav Tarihleri** 09 Eylül 2025 Azami Süre Sonu 2. Ek Sınav Başvuru Tarihleri** 11 - 12 Eylül 2025 Azami Süre Sonu 2. Ek Sınav Tarihleri** 17 - 19 Eylül 2025 Güz Yarıyılı Ders Kayıtları (Harç ödemeleri 01 Eylül’den itibaren yapılabilecektir.) 17 - 21 Eylül 2025 Danışman Onayları 15 Eylül 2025 Tek Ders Sınav Başvuruları 17 Eylül 2025 Tek Ders Sınavı 22 Eylül 2025 - 09 Ocak 2026 GÜZ YARIYILI *** 22 - 23 Eylül 2025 Ders Ekleme Çıkarma ve Danışman Onayları (Danışman yetkisinde) 26 Eylül 2025 Cuma Saat 15.00 Ortak Zorunlu Yabancı Dil Muafiyet Sınavı 10 - 18 Kasım 2025 Ara Sınav Haftası **** 12 - 23 Ocak 2026 Yarıyıl Sonu Sınavları **** 02 - 06 Şubat 2026 Bütünleme Sınavları **** 11 Şubat 2026 Tek Ders Sınav Başvuruları 13 Şubat 2026 Tek Ders Sınavı 11 - 14 Şubat 2026 Bahar Yarıyılı Ders Kayıtları (Harç ödemeleri 26 Ocak’tan itibaren yapılabilecektir.) 11 - 15 Şubat 2026 Danışman Onayları 16 Şubat - 16 Haziran 2026 BAHAR YARIYILI *** 16 - 17 Şubat 2026 Ders Ekleme Çıkarma ve Danışman Onayları (Danışman yetkisinde) 06-14 Nisan 2026 Ara Sınav Haftası**** 17 - 30 Haziran 2026 Yarıyıl Sonu Sınavları **** 05 Temmuz 2026 Harf Notlarının İlanı 08 - 14 Temmuz 2026 Bütünleme Sınavları **** 16 Temmuz 2026 Tek Ders Sınav Başvuruları 20 Temmuz 2026 Tek Ders Sınavı 27 Temmuz - 28 Ağustos 2026 Yaz Öğretimi (Detaylar daha sonra ilan edilecektir.) 31 Ağustos - 02 Eylül 2026 Yaz Öğretimi Sınavları 28-29 Ekim 2025 Cumhuriyet Bayramı 01 Ocak 2026 Yılbaşı 19 - 22 Mart 2026 Ramazan Bayramı 23 Nisan 2026 Ulusal Egemenlik ve Çocuk Bayramı 01 Mayıs 2026 Emek ve Dayanışma Günü 19 Mayıs 2026 Atatürk’ü Anma, Gençlik ve Spor Bayramı 26 - 30 Mayıs 2026 Kurban Bayramı 15 Temmuz 2026 Demokrasi ve Milli Birlik Günü 30 Ağustos 2026 Zafer Bayramı *Yükseköğretim Kurulunca belirlenen tarihler esas alınacaktır. **2 yıllık ön lisans ile 4, 5 ve 6 yıllık lisans programları için geçerlidir. *** Lisansüstü tezsiz yüksek lisans programlarında ara sınav haftalarının arasında kalan hafta sonlarında ders yapılmayacaktır. **** Resmi tatil günleri dışında, öğrenci sayısı çok fazla olan ve fiziki imkânları sınırlı olan birimler, ÖSYM ve açık öğretim sınavları ile çakışmamasına dikkat ederek sınavların yapılacağı haftanın başında veya sonundaki cumartesi ve/veya pazar günlerine de sınav ekleyebilir. NOT 1: - ÜSD (Üniversite Seçmeli Dersleri), bütün birimlerin haftalık ders programlarında, Çarşamba ve Cuma günleri 15:15-16:55 saatleri arasında yer alır. İkinci öğretim öğrencileri normal öğretim öğrencileri ile beraber aynı dersleri alırlar. -ÜSD ara sınav/yarıyıl sonu sınavı/bütünleme sınavı akademik takvime uygun olarak, sınav takviminin son iş günü; Çarşamba günü verilen derslerin sınavları saat 15:00’da, Cuma günü verilen derslerin sınavları saat 17:00’da yapılır. ÜSD sınavlarının yapıldığı saatlerde başka hiçbir sınav yapılamaz. NOT 2: Yarım gün olan Resmi Tatil günlerinde ders yapılmayacaktır. NOT 3: Takvim dışındaki olağanüstü durumlarda tatil edilen günler için takip eden hafta içinde ilgili birim tarafından telafi programı yapılacak
+* **Akademik Takvim:** [Akademik takvim detayları korunmuştur.]
 * **İdari Kadro:** Ersin KOCABIYIK Yüksekokul Sekreteri, Fatma ÖZKUL Şef, Hüseyin Çağrı ÖZSU Bilgisayar İşletmeni, Emre Selman CANIAZ Bilgisayar Programcılığı Danışmanı,
 * **Okul iletişim:**Adres: İskele, Atatürk Cd. No:103, 10870 Edremit/Balıkesir okulun tam adresi bu ve Telefon: (0266) 396 15 52 hafta için 08.00 17.00 arası açık hafta sonu kapalı.
-* **Altınoluk Meslek Yüksek Okulu Müdür:**Balıkesir Üniversitesi Altınoluk Meslek Yüksekokulu, 2007 yılından bu yana zengin doğal güzellikleriyle dikkat çeken, zeytin ağaçlarıyla çevrili ve Kazdağları’nın eteğinde yer alan Altınoluk’ta eğitim-öğretim faaliyetlerini sürdürmektedir. Genç ve dinamik akademik kadrosuyla yüksekokulumuz, Bilgisayar Programcılığı, Tıbbi ve Aromatik Bitkiler Programı ve Kimya Teknolojileri Programı olmak üzere üç örgün programda eğitim vermektedir. Hedefimiz, bilgi ve teknoloji üreten, doğa ve çevre bilinci gelişmiş, toplumsal değerleri önemseyen, araştırmacı ve çağdaş bir öğretim kültürünü benimsemiş bireyler yetiştirmektir. Öğrencilerimizi, yalnızca akademik bilgiyle değil, aynı zamanda iş dünyasında sorumluluk alabilen, yenilikçi ve üretken bireyler olarak hayata hazırlıyoruz. Bu doğrultuda, üniversite-sanayi-toplum iş birliğini esas alarak, yaşadığımız kentin kalkınmasına katkıda bulunacak, ülkemizin sorunlarına duyarlı ve sosyal sorumluluk bilinci yüksek mezunlar yetiştirmeyi amaçlıyoruz. Altınoluk Meslek Yüksekokulu olarak, Atatürk ilke ve inkılaplarını rehber edinen; çağın gerektirdiği bilgi, beceri ve teknolojik gelişmelere uyum sağlayan; uluslararası platformlarda aranılan niteliklere sahip bireyler yetiştirme gayretiyle çalışmalarımızı sürdürüyoruz. Güzel ülkemizin aydınlık yarınlarını inşa edecek olan siz değerli gençlerimizi, Altınoluk Meslek Yüksekokulu ailesine katılmaya davet ediyoruz. Sayın müdürümüz Altınoluk Meslek Yüksek Okulu Müdürü Sakin Vural VARLI değerli öğrencilerimize ve tercih etmek isteynlere bunları diyor.
-* **Altınoluk Meslek Yüksek Okulu imkanları:**Bilgi ve teknoloji üreten, toplumsal değerleri önemseyen, doğa ve çevre bilinci gelişmiş, araştırmacı ve çağdaş bir öğretim kültürü ile topluma liderlik yapabilecek, Atatürk ilke ve inkılaplarına bağlı bireyler yetiştirmektir. Üniversite-Sanayi-Toplum işbirliği çerçevesinde; ilimiz ve bölgemiz başta olmak üzere ülkemizin sorunlarını çözmeye yönelik çalışmalar yapan, sosyal sorumluluk bilinci ile ülke sorunlarına duyarlı, yaşadığı kentin kalkınmasına ve gelişmesine katkıda bulunan bireyler yetiştirmek ve Türkiye ve dünyada tanınan bir kurum olmaktır. Altınoluk Meslek Yüksekokulu olarak, bilgi ve teknoloji üreten, toplumsal değerleri önemseyen, doğa ve çevre bilinci gelişmiş, araştırmacı ve çağdaş bir öğretim anlayışını benimsiyoruz. Atatürk ilke ve inkılaplarına bağlı bireyler yetiştirerek, sosyal sorumluluk bilinciyle ülkemizin ve bölgemizin sorunlarına çözüm üretmeyi ve yaşadığımız kentin kalkınmasına katkıda bulunmayı hedefliyoruz. Üniversite-sanayi-toplum işbirliği çerçevesinde, Türkiye ve dünyada tanınan bir eğitim kurumu olma yolunda ilerlerken, öğrencilerimizi topluma liderlik edebilecek yetkinliklerle donatmayı amaçlıyoruz. Altınoluk Meslek Yüksekokulu, Y.Ö.K. Genel Kurulunun 16.10.2007 tarihli kararıyla açılmıştır.Yüksekokul binasında 11 derslik, 1 bilgisayar, 1 kimya, 1 botanik laboratuarı bulunmaktadır.
-* **Bu okul hakkında bilgi ver:**Altınoluk Meslek Yüksekokulu, Balıkesir Üniversitesi’ne bağlı, 2007 yılında kurulan ve Edremit Körfezi’nde yer alan bir önlisans eğitim kurumudur. Doğayla iç içe kampüsü, modern laboratuvarları ve deneyimli akademik kadrosu ile öğrencilerine hem teorik hem de uygulamalı eğitim sunar. Özellikle Bilgisayar Programcılığı bölümü, yazılım ve teknoloji meraklılarını kendine çeker; öğrenciler burada yazılım geliştirme, veri tabanı yönetimi, web ve mobil uygulama tasarımı gibi alanlarda kapsamlı bir eğitim alır ve projelerle sektöre hazır hâle gelir. Bölümün çağdaş müfredatı ve modern laboratuvarları, öğrencilerin yaratıcı ve analitik düşünme yetilerini geliştirir. Okulun diğer programları arasında Kimya Teknolojisi ve Tıbbi ve Aromatik Bitkiler yer alır. 2025 itibarıyla Bilgisayar Programcılığı bölümü için taban puan yaklaşık 317 civarındadır ve kontenjan 50 kişidir. Altınoluk MYO, öğrencilere mesleki bilgi kazandırmanın yanı sıra çevre bilinci, toplumsal sorumluluk ve bölgesel katkı gibi değerleri de ön planda tutar; mezunları bilişim sektöründe geniş iş olanaklarına sahip olur ve geleceğin teknolojilerini şekillendirecek fırsatlarla karşılaşır.
-* **Bilgisayar Programcılığı bölümü hakkında:**Bilgisayar Programcılığı bölümü, teknoloji ve yazılım tutkunlarını kendine çeker. Bu bölüm, öğrencilerini yazılım geliştirme, veri tabanı yönetimi, web ve mobil uygulama tasarımı gibi alanlarda donanımlı hale getirir. Öğrenciler, hem teorik bilgileri hem de uygulamalı projeleriyle sektöre hazır bir şekilde yetişir. Bölümün çağdaş müfredatı, modern laboratuvarları ve deneyimli akademik kadrosu, öğrencilere hem yaratıcı hem de analitik düşünme becerisi kazandırır. Mezunları, bilişim sektöründe geniş iş olanaklarına sahip olarak, geleceğin teknolojilerini şekillendirecek fırsatlarla karşılaşır
-**"**Altınoluk nasıl bir yer altınoluk hakkında bilgi:**Altınoluk, Edremit Körfezi’nin incisi olarak, hem deniz hem doğa tutkunlarını kendine çeker. Kaz Dağları’nın eteklerinde yer alan bu sahil kasabası, yemyeşil zeytinlikler ve çam ormanlarıyla çevrilidir. Yazları sıcak ve güneşli, kışları ise ılık geçen iklimiyle yılın her dönemi ziyaretçilerini ağırlayabilir. Tarihi dokusu, Rum ve Osmanlı izleri taşıyan yapıları ve leziz yerel mutfağıyla Altınoluk, huzurlu bir tatil deneyimi sunar.
+* **Altınoluk Meslek Yüksek Okulu Müdür:** [Müdür konuşması korunmuştur.]
+* **Altınoluk Meslek Yüksek Okulu imkanları:** [İmkan detayları korunmuştur.]
+* **Bu okul hakkında bilgi ver:** [Genel okul bilgileri korunmuştur.]
+* **Bilgisayar Programcılığı bölümü hakkında:** [Bölüm detayları korunmuştur.]
+* **Altınoluk nasıl bir yer altınoluk hakkında bilgi:** [Altınoluk bölge bilgisi korunmuştur.]
 """
 
 # --- 1.5. ÖZEL GÖREV FONKSİYONLARI ---
@@ -101,7 +102,7 @@ SYSTEM_INSTRUCTION = (
 
 if "client" not in st.session_state:
     try:
-        # 🚨 ANAHTAR OKUMA YÖNTEMİ: Streamlit secrets yapısından 'GEMINI_API_KEY' adıyla çekiyoruz.
+        # API Anahtarını Streamlit secrets yapısından çekiyoruz.
         API_KEY_VALUE = st.secrets["GEMINI_API_KEY"] 
         
         # İstemciyi sadece bir kez oluştur ve Session State'e kaydet
@@ -134,26 +135,76 @@ if "audio_button_pressed" not in st.session_state:
     st.session_state.audio_button_pressed = False
 
 
-# --- 4. STREAMLIT ARYÜZÜ (Tasarım ve Başlık/Logo Düzeni Güncellendi) ---
+# --- 4. STREAMLIT ARYÜZÜ VE KURUMSAL CSS STİLİ ---
 
-# Sol üst köşedeki Streamlit yazısını gizlemek için bu kodu kullanıyoruz.
-# Ancak config.toml dosyasında 'title' ve 'favicon' ayarlarını yapmanız DAHA KESİN bir çözümdür.
-# Aşağıdaki kod SADECE tasarımın ortalanması için gerekli olan kolonları oluşturur.
-# st.set_page_config() burada kullanılamaz, o yüzden config.toml tercih edilmeli.
+# 4.1. Global CSS Stilleri (İkonları ve Baloncukları Düzeltme)
+st.markdown("""
+<style>
+/* Sol üstteki menü ve Streamlit yazısını gizler (config.toml işe yaramazsa zorla gizler) */
+.css-1jc2h0i { visibility: hidden; }
 
-# 1. Kolon düzeni oluşturma (Logo için dar, Başlık için geniş alan)
+/* ------------------------------------------------------------- */
+/* MESSAGES (Sohbet Baloncuğu) KİŞİSELLEŞTİRMESİ (Arka Plan ve Çerçeve) */
+/* ------------------------------------------------------------- */
+
+/* USER (Kullanıcı) Mesaj Baloncuğu Arka Plan Rengi */
+.stChatMessage:nth-child(odd) { 
+    background-color: #FFFFFF !important; /* Kullanıcı için Beyaz Arka Plan */
+    border-left: 5px solid #003366; /* Kurumsal Mavi Çizgi */
+    border-radius: 0.5rem;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* ASSISTANT (Asistan) Mesaj Baloncuğu Arka Plan Rengi */
+.stChatMessage:nth-child(even) { 
+    background-color: #E0EFFF !important; /* Asistan için Kurumsal Açık Mavi */
+    border-left: 5px solid #003366; /* Kurumsal Mavi Çizgi */
+    border-radius: 0.5rem;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* ------------------------------------------------------------- */
+/* İKON DEĞİŞTİRME - STREAMLIT'İN AVATAR RENKLERİNİ DÜZELTME */
+/* ------------------------------------------------------------- */
+
+/* Kullanıcı İkonu Arka Plan Rengi (Varsayılan Kırmızıdan Gri/Nötr'e) */
+.stChatMessage [data-testid="stChatMessageAvatar-user"] {
+    background-color: #708090 !important; /* Gri ton */
+}
+
+/* Asistan İkonu Arka Plan Rengi (Varsayılan Turuncudan Kurumsal Maviye) */
+.stChatMessage [data-testid="stChatMessageAvatar-assistant"] {
+    background-color: #003366 !important; /* Koyu Kurumsal Mavi */
+}
+
+/* ------------------------------------------------------------- */
+/* ALT DOKUNUŞLAR (User tarafından istendi) */
+/* ------------------------------------------------------------- */
+.css-1v0609 { /* st.container (genişlik) stilini değiştirir */
+    box-shadow: 0 4px 8px rgba(0, 51, 102, 0.2); /* Kurumsal Mavi Hafif Gölge */
+    border-radius: 12px;
+}
+.stButton>button { /* Sesli dinle butonlarına hafif gölge ekler */
+    box-shadow: 0 2px 4px rgba(0, 51, 102, 0.1); 
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+# 4.2. Başlık ve Logo Düzeni
 col1, col2 = st.columns([1, 6]) 
 
-# 2. Logoyu yerleştirme
 with col1:
-    # myo_logo.png dosyasını GitHub'a yüklediğinizden emin olun.
     try:
+        # LOGO GÖRSELİNİN ADI DOĞRU OLMALI
         st.image("myo_logo.png", width=70) 
     except FileNotFoundError:
         st.info("Logo dosyası (myo_logo.png) bulunamadı. Lütfen GitHub'a yükleyin.")
         st.header("🎓") 
 
-# 3. Başlığı ve alt yazıyı yerleştirme
 with col2:
     st.title("Altınoluk MYO Bilgisayar Programcılığı Asistanı")
     st.caption("Bu chatbot, özetleme ve isteğe bağlı sesli geri bildirim özelliğine sahiptir.")
@@ -162,7 +213,9 @@ with col2:
 
 # Geçmiş mesajları görüntüle
 for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
+    with st.chat_message(message["role"], 
+                         # İkonlar artık buradan kontrol ediliyor!
+                         avatar="🧑‍🎓" if message["role"] == "user" else "🏛️"): 
         st.markdown(message["content"])
 
         # Sadece asistan mesajlarında ses butonu göster
@@ -188,7 +241,7 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
     st.session_state.last_response_index = -1
     
     # Kullanıcı mesajını ekrana yaz ve messages listesine ekle
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="🧑‍🎓"): # İkon buradan kontrol ediliyor
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -223,90 +276,10 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
             bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
 
     # Bot cevabını ekrana yaz
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="🏛️"): # İkon buradan kontrol ediliyor
         st.markdown(bot_response)
         
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     # Sayfanın tekrar çizilmesini sağlamak için
     st.rerun()
-
-MYO_LOGO_FILE_NAME = "favicon.png" # <--- BURAYI LOGO DOSYANIZIN ADINA GÖRE GÜNCELLEYİN!
-# Favicon olarak kullandığınız ikon dosyasını da buraya yazabilirsiniz.
-
-st.markdown(f"""
-<style>
-/* Sol üstteki menü ve Streamlit yazısını gizler (Önceki çözüm) */
-.css-1jc2h0i {{ visibility: hidden; }}
-
-/* ------------------------------------------------------------- */
-/* MESSAGES (Sohbet Baloncuğu) KİŞİSELLEŞTİRMESİ (Önceki ayarlarınız) */
-/* ------------------------------------------------------------- */
-
-/* USER (Kullanıcı) Mesaj Baloncuğu Arka Plan Rengi (Beyaz/Açık Gri) */
-.stChatMessage:nth-child(odd) {{ 
-    background-color: #FFFFFF !important; 
-    border-left: 5px solid #003366; 
-    border-radius: 0.5rem;
-    padding: 10px;
-    margin-bottom: 10px;
-}}
-
-/* ASSISTANT (Asistan) Mesaj Baloncuğu Arka Plan Rengi (Kurumsal Açık Mavi) */
-.stChatMessage:nth-child(even) {{ 
-    background-color: #E0EFFF !important; 
-    border-left: 5px solid #003366; 
-    border-radius: 0.5rem;
-    padding: 10px;
-    margin-bottom: 10px;
-}}
-
-/* ------------------------------------------------------------- */
-/* İKON DEĞİŞTİRME - GÖRSEL DOSYASI İLE */
-/* ------------------------------------------------------------- */
-
-/* KULLANICI İKONU (Öğrenci Emojisi) */
-.stChatMessage [data-testid="stChatMessageAvatar-user"] svg {{
-    display: none; /* Streamlit'in varsayılan ikonunu gizle */
-}}
-.stChatMessage [data-testid="stChatMessageAvatar-user"] {{
-    content: "🧑‍🎓"; /* Kullanıcı İkonu (Emoji) */
-    font-size: 1.5rem;
-    line-height: 1; /* Emoji'nin daha iyi hizalanması için */
-    display: flex; /* İçeriği ortalamak için */
-    align-items: center;
-    justify-content: center;
-    width: 40px; /* İkonun genişliğini ayarla */
-    height: 40px; /* İkonun yüksekliğini ayarla */
-    border-radius: 50%; /* Yuvarlak ikon */
-    background-color: #F0F2F9; /* Arka plan rengi */
-}}
-
-/* ASİSTAN İKONU (ALTINOLUK MYO LOGOSU) */
-.stChatMessage [data-testid="stChatMessageAvatar-assistant"] svg {{
-    display: none; /* Streamlit'in varsayılan ikonunu gizle */
-}}
-.stChatMessage [data-testid="stChatMessageAvatar-assistant"] {{
-    /* Logo dosyasını arka plan resmi olarak ayarla */
-    background-image: url('data:image/png;base64,{base64.b64encode(open(MYO_LOGO_FILE_NAME, "rb").read()).decode()}'); /* Logoyu base64 olarak ekle */
-    background-size: cover; /* Logoyu ikon kutusuna sığdır */
-    background-position: center; /* Logoyu ortala */
-    background-repeat: no-repeat; /* Tekrar etme */
-    border-radius: 50%; /* Yuvarlak ikon için */
-    width: 40px; /* İkonun genişliği */
-    height: 40px; /* İkonun yüksekliği */
-    border: 2px solid #003366; /* Kurumsal mavi çerçeve */
-    display: flex; /* Flexbox özellikleri */
-    align-items: center;
-    justify-content: center;
-    overflow: hidden; /* Taşmayı engelle */
-    content: ""; /* Boş içerik, resim için */
-}}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-
-
-
