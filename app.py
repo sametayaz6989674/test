@@ -6,7 +6,7 @@ from gtts import gTTS
 import io 
 import time
 import google.genai.errors 
-# YENİ EKLENEN KÜTÜPHANE: Sesli giriş için
+# Sesli giriş için kütüphane
 from streamlit_mic_recorder import mic_recorder 
 
 # --- 0. UYGULAMA GENEL AYARLARI (FAVICON VE SAYFA ADI) ---
@@ -88,7 +88,7 @@ def handle_special_query(client, prompt, model_name, myo_kaynagi, messages):
 
     return prompt, False
 
-# --- 2. SİSTEM TALİMATI (Chatbot'un Kimliği) ---
+# --- 2. SİSTEM TALİMATI (Chatbot'un Kimliği - SÜPER ZEKA MODU) ---
 SYSTEM_INSTRUCTION = (
     "Sen, Altınoluk Meslek Yüksekokulu Bilgisayar Programcılığı Bölümü'nü tanıtan yapay zeka asistanısın. "
     "Aşağıdaki 'BİLGİ KAYNAĞI' metnini kullanarak cevap ver. "
@@ -118,34 +118,51 @@ if "client" not in st.session_state:
 
 client = st.session_state.client
 
-# Session state'i ilk kez başlatma
-if "model_name" not in st.session_state:
-    st.session_state.model_name = 'gemini-2.5-flash'
-    st.session_state.messages = []
-    if "history" not in st.session_state:
-        st.session_state.history = []
+# --- 4. SESSION STATE YÖNETİMİ VE CALLBACK FONKSİYONLARI ---
 
 # Ses butonu state'leri
 if "last_response_index" not in st.session_state:
     st.session_state.last_response_index = -1
 if "audio_button_pressed" not in st.session_state:
     st.session_state.audio_button_pressed = False
+
 # Sesli dinle butonu tıklandığında state'i güncelleyen fonksiyon
 def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
-# --- 4. STREAMLIT ARYÜZÜ VE KURUMSAL CSS STİLİ ---
+# MİKROFON İÇİN SESSION STATE'LERİ
+if 'mic_button_clicked' not in st.session_state:
+    st.session_state.mic_button_clicked = False
+if 'prompt_from_mic' not in st.session_state:
+    st.session_state.prompt_from_mic = ''
 
-# 4.1. Global CSS Stilleri
+# YENİ EKLE: Sesli girişten metin geldiğinde çalışan fonksiyon (Hata Çözümü)
+def callback_mic_recorder():
+    """Kayıt durdurulduğunda çalışır ve metni session state'e kaydeder."""
+    # mic_recorder'dan gelen metni kontrol et (TypeError'ı önler)
+    if st.session_state.mic_recorder and st.session_state.mic_recorder.get('text'):
+        st.session_state.prompt_from_mic = st.session_state.mic_recorder['text']
+        st.session_state.mic_button_clicked = True
+    else:
+        st.session_state.mic_button_clicked = False
+
+# Diğer başlangıç state'leri
+if "model_name" not in st.session_state:
+    st.session_state.model_name = 'gemini-2.5-flash'
+    st.session_state.messages = []
+    if "history" not in st.session_state:
+        st.session_state.history = []
+
+# --- 5. STREAMLIT ARYÜZÜ VE KURUMSAL CSS STİLİ ---
+
+# 5.1. Global CSS Stilleri
 st.markdown("""
 <style>
 /* Sol üstteki menü ve Streamlit yazısını gizler */
 .css-1jc2h0i { visibility: hidden; }
 
-/* ------------------------------------------------------------- */
-/* MESSAGES (Sohbet Baloncuğu) KİŞİSELLEŞTİRMESİ */
-/* ------------------------------------------------------------- */
+/* Sohbet Baloncuğu KİŞİSELLEŞTİRMESİ */
 .stChatMessage:nth-child(odd) { 
     background-color: #FFFFFF !important; 
     border-left: 5px solid #003366; 
@@ -177,7 +194,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# 4.2. Başlık ve Logo Düzeni
+# 5.2. Başlık ve Logo Düzeni
 col1, col2 = st.columns([1, 6]) 
 
 with col1:
@@ -208,44 +225,36 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("🔊 Sesli Dinle", key=f"play_audio_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# Kullanıcı girişi bölümü
-with st.container():
-    st.write("---") # Yatay çizgi ekle
-    # 5. YENİ BÖLÜM: MİKROFONDAN SES ALMA İŞLEMİ
+# --- 6. KULLANICI GİRİŞİ (Yazılı ve Sesli) ---
+user_input_container = st.container()
+with user_input_container:
+    st.write("---") 
     st.markdown("##### 🎙️ Veya Sesli Sorun")
     
     # mic_recorder bileşeni
-    # start_prompt: Kayıt başlatıldığında görünen metin
-    # stop_prompt: Kayıt durdurulduğunda görünen metin
-    # just_once: Kayıt sadece bir kez alınır
-    # use_streamlit_native_buttons: Streamlit'in kendi butonlarını kullanır (Görsel tutarlılık sağlar)
-    mic_result = mic_recorder(
+    mic_recorder(
         start_prompt="🔴 Kaydı Başlat", 
         stop_prompt="⏹️ Kaydı Durdur ve Metne Çevir", 
         key='mic_recorder',
+        on_record_stop=callback_mic_recorder, # KAYIT DURDUĞUNDA CALLBACK ÇALIŞACAK
         use_streamlit_native_buttons=True
     )
-    
-    # mic_recorder'dan metin gelip gelmediğini kontrol et
-    voice_input = ""
-    if mic_result and mic_result.get('text'):
-        voice_input = mic_result['text']
-        # Kaydı aldıktan sonra otomatik olarak metin kutusuna doldur
-        # Streamlit'te doğrudan st.chat_input'a değer atanamadığı için,
-        # bu değeri session_state'e atayıp bir sonraki rerunda kullanacağız.
-        st.session_state.voice_prompt = voice_input
 
     # 6. KLASİK YAZILI GİRİŞ
-    # Sesli giriş varsa, onu metin girişine aktar
-    if 'voice_prompt' in st.session_state and st.session_state.voice_prompt:
-        prompt = st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?", value=st.session_state.voice_prompt)
-        # Session state'i sıfırla ki, kullanıcı kendisi yazmaya devam edebilsin
-        del st.session_state.voice_prompt
-    else:
-        prompt = st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
+    prompt = None # Prompt başlangıçta None
+
+    # Eğer mikrofondan bir metin geldiyse (callback çalıştıysa), onu prompt olarak kullan
+    if st.session_state.mic_button_clicked:
+        prompt = st.session_state.prompt_from_mic
+        # Session state'i sıfırla ki, loop'a girmesin
+        st.session_state.mic_button_clicked = False
+    
+    # Sesli giriş yoksa, normal yazılı girişi kontrol et
+    if not prompt:
+        prompt = st.chat_input("Altınoluk, Altınoluk MYO hakkında sorunuz nedir?")
 
 
-# KLASİK GİRİŞ VEYA SESLİ GİRİŞ İLE İŞLEM BAŞLATMA
+# --- 7. İŞLEM BAŞLATMA ---
 if prompt:
     
     st.session_state.audio_button_pressed = False
