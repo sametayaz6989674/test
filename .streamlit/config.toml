@@ -7,7 +7,7 @@ title = "Altınoluk MYO Asistanı"
 
 # Favicon (İkon) dosyasının adını belirtme
 # Bu dosyanın ana dizinde olması gerekir (Örn: favicon.png)
-favicon = "favicon.ico" 
+favicon = "favicon.png" 
 
 # --- TEMA AYARLARI (Kurumsal Mavi/Beyaz) ---
 [theme]
