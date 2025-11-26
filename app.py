@@ -131,21 +131,22 @@ def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
-# MİKROFON İÇİN SESSION STATE'LERİ
-if 'mic_button_clicked' not in st.session_state:
-    st.session_state.mic_button_clicked = False
-if 'prompt_from_mic' not in st.session_state:
-    st.session_state.prompt_from_mic = ''
+# MİKROFON İÇİN GEÇİCİ SESSION STATE'LERİ
+if 'temp_mic_prompt' not in st.session_state:
+    st.session_state.temp_mic_prompt = None
 
-# YENİ EKLE: Sesli girişten metin geldiğinde çalışan fonksiyon (Hata Çözümü)
-def callback_mic_recorder():
-    """Kayıt durdurulduğunda çalışır ve metni session state'e kaydeder."""
-    # mic_recorder'dan gelen metni kontrol et (TypeError'ı önler)
-    if st.session_state.mic_recorder and st.session_state.mic_recorder.get('text'):
-        st.session_state.prompt_from_mic = st.session_state.mic_recorder['text']
-        st.session_state.mic_button_clicked = True
-    else:
-        st.session_state.mic_button_clicked = False
+# YENİ HATA ÇÖZÜMÜ: Sesli girişten metin geldiğinde çalışan fonksiyon
+def handle_mic_input():
+    """Kayıt durduğunda çalışır ve mic_recorder'dan gelen metni kontrol eder."""
+    # mic_recorder'ın sonucu session_state.mic_recorder'da saklanır
+    mic_result = st.session_state.mic_recorder
+
+    # SADECE metin varsa ve boş değilse prompt olarak ayarla
+    if mic_result and mic_result.get('text') and mic_result['text'].strip():
+        # Metni geçici olarak Session State'e kaydet
+        st.session_state.temp_mic_prompt = mic_result['text']
+        # Session State güncellendiği için yeniden çizimi zorla (İşlem 7'ye atla)
+        st.rerun()
 
 # Diğer başlangıç state'leri
 if "model_name" not in st.session_state:
@@ -226,8 +227,14 @@ for i, message in enumerate(st.session_state.messages):
                 pass 
 
 # --- 6. KULLANICI GİRİŞİ (Yazılı ve Sesli) ---
-user_input_container = st.container()
-with user_input_container:
+prompt = None # Prompt başlangıçta None
+
+# Eğer bir önceki adımda sesli giriş alınmışsa, prompt'u buradan al ve sıfırla
+if st.session_state.temp_mic_prompt:
+    prompt = st.session_state.temp_mic_prompt
+    st.session_state.temp_mic_prompt = None # Tekrar kullanmaması için sıfırla
+
+with st.container():
     st.write("---") 
     st.markdown("##### 🎙️ Veya Sesli Sorun")
     
@@ -236,20 +243,11 @@ with user_input_container:
         start_prompt="🔴 Kaydı Başlat", 
         stop_prompt="⏹️ Kaydı Durdur ve Metne Çevir", 
         key='mic_recorder',
-        on_record_stop=callback_mic_recorder, # KAYIT DURDUĞUNDA CALLBACK ÇALIŞACAK
+        callback=handle_mic_input, # Kayıt durduğunda handle_mic_input fonksiyonunu çağır
         use_streamlit_native_buttons=True
     )
-
-    # 6. KLASİK YAZILI GİRİŞ
-    prompt = None # Prompt başlangıçta None
-
-    # Eğer mikrofondan bir metin geldiyse (callback çalıştıysa), onu prompt olarak kullan
-    if st.session_state.mic_button_clicked:
-        prompt = st.session_state.prompt_from_mic
-        # Session state'i sıfırla ki, loop'a girmesin
-        st.session_state.mic_button_clicked = False
     
-    # Sesli giriş yoksa, normal yazılı girişi kontrol et
+    # Yazılı giriş sadece sesli giriş yoksa gösterilir
     if not prompt:
         prompt = st.chat_input("Altınoluk, Altınoluk MYO hakkında sorunuz nedir?")
 
