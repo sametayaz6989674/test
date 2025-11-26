@@ -7,7 +7,7 @@ title = "Altınoluk MYO Asistanı"
 
 # Favicon (İkon) dosyasının adını belirtme
 # Bu dosyanın ana dizinde olması gerekir (Örn: favicon.png)
-favicon = "favicon.png" 
+favicon = "favicon.ico" 
 
 # --- TEMA AYARLARI (Kurumsal Mavi/Beyaz) ---
 [theme]
@@ -15,4 +15,5 @@ primaryColor="#003366"      # Butonlar ve vurgular için Koyu Mavi/Lacivert
 backgroundColor="#F0F2F9"   # Açık Gri arka plan
 secondaryBackgroundColor="#FFFFFF" # Beyaz yan çubuk/kod blokları
 textColor="#262730"         # Koyu yazı rengi
+
 font="sans serif"
