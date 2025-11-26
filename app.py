@@ -22,6 +22,61 @@ MYO_BILGI_KAYNAGI = """
 * **Kariyer Fırsatları:** Mezunlar Junior Yazılımcı, Veri Analizi Asistanı, Teknik Destek Uzmanı ve Front-end Geliştirici olarak özel sektörde iş bulabilmektedir.
 * **Staj Durumu:** Tüm öğrencilerin 3. ve 4. yarıyıl arasında **zorunlu 30 iş günü staj** yapma yükümlülüğü vardır.
 * **Okul İklimi:** Öğrenci yorumlarına göre okul samimi, küçük ve eğitmenler birebir ilgi gösterebilmektedir.
+* **Okul Eğlence Hobi Yemek:** Okulumuzun Yemekhanesi mevcuttur öğrenciler 40 TL karşlığında yemek yiyebilir. Okulumuzda kantin mevcuttur voleybol sahası vardır öğrencilerin masa tenisi oynayabileceği alan mevcuttur. okulumuzun kütüphanesi mevcuttur ders çalışmak için veya araştırma yapmak için öğrenciler kullanabilir. okul bahçesi güvenlidir her saat güvenlik kapıda beklemektedir. öğrencilere öğrenci kartı verilmektedir(sınavlarda öğrenci kartları masalara koyulur) okulumuzun konferans salonu mevcuttur 
+* **Akademik Takvim: 01 Eylül 2025 Azami Süre Sonu Sınavlarına Girecek Öğrencilerin İsimlerinin İlan Edilmesi
+(İlgili birim web sayfasında)**
+02 Eylül 2025 Azami Süre Sonu 1. Ek Sınav Başvuru Tarihleri**
+04 - 05 Eylül 2025 Azami Süre Sonu 1. Ek Sınav Tarihleri**
+09 Eylül 2025 Azami Süre Sonu 2. Ek Sınav Başvuru Tarihleri**
+11 - 12 Eylül 2025 Azami Süre Sonu 2. Ek Sınav Tarihleri**
+17 - 19 Eylül 2025 Güz Yarıyılı Ders Kayıtları (Harç ödemeleri 01 Eylül’den itibaren yapılabilecektir.)
+17 - 21 Eylül 2025 Danışman Onayları
+15 Eylül 2025 Tek Ders Sınav Başvuruları
+17 Eylül 2025 Tek Ders Sınavı
+22 Eylül 2025 - 09 Ocak 2026 GÜZ YARIYILI ***
+22 - 23 Eylül 2025 Ders Ekleme Çıkarma ve Danışman Onayları (Danışman yetkisinde)
+26 Eylül 2025 Cuma Saat 15.00 Ortak Zorunlu Yabancı Dil Muafiyet Sınavı
+10 - 18 Kasım 2025 Ara Sınav Haftası ****
+12 - 23 Ocak 2026 Yarıyıl Sonu Sınavları ****
+29 Ocak 2026 Harf Notlarının İlanı
+02 - 06 Şubat 2026 Bütünleme Sınavları ****
+11 Şubat 2026 Tek Ders Sınav Başvuruları
+13 Şubat 2026 Tek Ders Sınavı
+11 - 14 Şubat 2026 Bahar Yarıyılı Ders Kayıtları (Harç ödemeleri 26 Ocak’tan itibaren yapılabilecektir.)
+11 - 15 Şubat 2026 Danışman Onayları
+16 Şubat - 16 Haziran 2026 BAHAR YARIYILI ***
+16 - 17 Şubat 2026 Ders Ekleme Çıkarma ve Danışman Onayları (Danışman yetkisinde)
+06-14 Nisan 2026 Ara Sınav Haftası****
+17 - 30 Haziran 2026 Yarıyıl Sonu Sınavları ****
+05 Temmuz 2026 Harf Notlarının İlanı
+08 - 14 Temmuz 2026 Bütünleme Sınavları ****
+16 Temmuz 2026 Tek Ders Sınav Başvuruları
+20 Temmuz 2026 Tek Ders Sınavı
+27 Temmuz - 28 Ağustos 2026 Yaz Öğretimi (Detaylar daha sonra ilan edilecektir.)
+31 Ağustos - 02 Eylül 2026 Yaz Öğretimi Sınavları
+28-29 Ekim 2025 Cumhuriyet Bayramı
+01 Ocak 2026 Yılbaşı
+19 - 22 Mart 2026 Ramazan Bayramı
+23 Nisan 2026 Ulusal Egemenlik ve Çocuk Bayramı
+01 Mayıs 2026 Emek ve Dayanışma Günü
+19 Mayıs 2026 Atatürk’ü Anma, Gençlik ve Spor Bayramı
+26 - 30 Mayıs 2026 Kurban Bayramı
+15 Temmuz 2026 Demokrasi ve Milli Birlik Günü
+30 Ağustos 2026 Zafer Bayramı
+*Yükseköğretim Kurulunca belirlenen tarihler esas alınacaktır.
+**2 yıllık ön lisans ile 4, 5 ve 6 yıllık lisans programları için geçerlidir.
+*** Lisansüstü tezsiz yüksek lisans programlarında ara sınav haftalarının arasında kalan hafta sonlarında ders yapılmayacaktır.
+**** Resmi tatil günleri dışında, öğrenci sayısı çok fazla olan ve fiziki imkânları sınırlı olan birimler, ÖSYM ve açık öğretim sınavları ile
+çakışmamasına dikkat ederek sınavların yapılacağı haftanın başında veya sonundaki cumartesi ve/veya pazar günlerine de sınav ekleyebilir.
+NOT 1: - ÜSD (Üniversite Seçmeli Dersleri), bütün birimlerin haftalık ders programlarında, Çarşamba ve Cuma günleri 15:15-16:55 saatleri
+arasında yer alır. İkinci öğretim öğrencileri normal öğretim öğrencileri ile beraber aynı dersleri alırlar.
+-ÜSD ara sınav/yarıyıl sonu sınavı/bütünleme sınavı akademik takvime uygun olarak, sınav takviminin son iş günü; Çarşamba günü verilen
+derslerin sınavları saat 15:00’da, Cuma günü verilen derslerin sınavları saat 17:00’da yapılır. ÜSD sınavlarının yapıldığı saatlerde başka hiçbir
+sınav yapılamaz.
+NOT 2: Yarım gün olan Resmi Tatil günlerinde ders yapılmayacaktır.
+NOT 3: Takvim dışındaki olağanüstü durumlarda tatil edilen günler için takip eden hafta içinde ilgili birim tarafından telafi programı
+yapılacak
+* **İdari Kadro:** Ersin KOCABIYIK Yüksekokul Sekreteri, Fatma ÖZKUL Şef, Hüseyin Çağrı ÖZSU Bilgisayar İşletmeni, Emre Selman CANIAZ Bilgisayar Programcılığı Danışmanı,
 * **Okul iletişim:**Adres: İskele, Atatürk Cd. No:103, 10870 Edremit/Balıkesir okulun tam adresi bu ve Telefon: (0266) 396 15 52 hafta için 08.00 17.00 arası açık hafta sonu kapalı.
 * **Altınoluk Meslek Yüksek Okulu Müdür:**Balıkesir Üniversitesi Altınoluk Meslek Yüksekokulu, 2007 yılından bu yana zengin doğal güzellikleriyle dikkat çeken, zeytin ağaçlarıyla çevrili ve Kazdağları’nın eteğinde yer alan Altınoluk’ta eğitim-öğretim faaliyetlerini sürdürmektedir. Genç ve dinamik akademik kadrosuyla yüksekokulumuz, Bilgisayar Programcılığı, Tıbbi ve Aromatik Bitkiler Programı ve Kimya Teknolojileri Programı olmak üzere üç örgün programda eğitim vermektedir. Hedefimiz, bilgi ve teknoloji üreten, doğa ve çevre bilinci gelişmiş, toplumsal değerleri önemseyen, araştırmacı ve çağdaş bir öğretim kültürünü benimsemiş bireyler yetiştirmektir. Öğrencilerimizi, yalnızca akademik bilgiyle değil, aynı zamanda iş dünyasında sorumluluk alabilen, yenilikçi ve üretken bireyler olarak hayata hazırlıyoruz. Bu doğrultuda, üniversite-sanayi-toplum iş birliğini esas alarak, yaşadığımız kentin kalkınmasına katkıda bulunacak, ülkemizin sorunlarına duyarlı ve sosyal sorumluluk bilinci yüksek mezunlar yetiştirmeyi amaçlıyoruz. Altınoluk Meslek Yüksekokulu olarak, Atatürk ilke ve inkılaplarını rehber edinen; çağın gerektirdiği bilgi, beceri ve teknolojik gelişmelere uyum sağlayan; uluslararası platformlarda aranılan niteliklere sahip bireyler yetiştirme gayretiyle çalışmalarımızı sürdürüyoruz. Güzel ülkemizin aydınlık yarınlarını inşa edecek olan siz değerli gençlerimizi, Altınoluk Meslek Yüksekokulu ailesine katılmaya davet ediyoruz. Sayın müdürümüz Altınoluk Meslek Yüksek Okulu Müdürü Sakin Vural VARLI değerli öğrencilerimize ve tercih etmek isteynlere bunları diyor.
 * **Altınoluk Meslek Yüksek Okulu imkanları:**Bilgi ve teknoloji üreten, toplumsal değerleri önemseyen, doğa ve çevre bilinci gelişmiş, araştırmacı ve çağdaş bir öğretim kültürü ile topluma liderlik yapabilecek, Atatürk ilke ve inkılaplarına bağlı bireyler yetiştirmektir. Üniversite-Sanayi-Toplum işbirliği çerçevesinde; ilimiz ve bölgemiz başta olmak üzere ülkemizin sorunlarını çözmeye yönelik çalışmalar yapan, sosyal sorumluluk bilinci ile ülke sorunlarına duyarlı, yaşadığı kentin kalkınmasına ve gelişmesine katkıda bulunan bireyler yetiştirmek ve Türkiye ve dünyada tanınan bir kurum olmaktır. Altınoluk Meslek Yüksekokulu olarak, bilgi ve teknoloji üreten, toplumsal değerleri önemseyen, doğa ve çevre bilinci gelişmiş, araştırmacı ve çağdaş bir öğretim anlayışını benimsiyoruz. Atatürk ilke ve inkılaplarına bağlı bireyler yetiştirerek, sosyal sorumluluk bilinciyle ülkemizin ve bölgemizin sorunlarına çözüm üretmeyi ve yaşadığımız kentin kalkınmasına katkıda bulunmayı hedefliyoruz. Üniversite-sanayi-toplum işbirliği çerçevesinde, Türkiye ve dünyada tanınan bir eğitim kurumu olma yolunda ilerlerken, öğrencilerimizi topluma liderlik edebilecek yetkinliklerle donatmayı amaçlıyoruz. Altınoluk Meslek Yüksekokulu, Y.Ö.K. Genel Kurulunun 16.10.2007 tarihli kararıyla açılmıştır. Altınoluk Meslek Yüksekokulu 2007-2008 Eğitim-Öğretim yılında ek kontenjanla Tıbbi Aromatik Bitkiler Bölümünde 15, Bilgisayar Teknolojileri ve Programlama Bölümünde ise 36 öğrenci olmak üzere toplam 51 öğrenci ile Eğitim Öğretime başlamıştır. 2008-2009 öğretim yılı yeni açılmış olan Kimya Teknolojileri Programı ve her üç bölümün ikinci öğretimleri ile beraber öğrenci sayısı 250 ye çıkmıştır. 2009-2010 öğretim yılında Öğrenci Sayımız 430 ‘a yükselmekle beraber 2010-2011 öğretim yılında bu sayının 500’ü geçmesi beklenmektedir. Yüksekokul binasında 11 derslik, 1 bilgisayar, 1 kimya, 1 botanik laboratuarının yanı sıra bir kapalı spor salonu bulunmaktadır.
