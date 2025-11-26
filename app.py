@@ -7,6 +7,16 @@ import io
 import time
 import google.genai.errors 
 
+# --- 0. UYGULAMA GENEL AYARLARI (FAVICON VE SAYFA ADI) ---
+# Tarayıcı sekmesindeki ikon ve sayfa başlığını ayarlar
+st.set_page_config(
+    page_title="Altınoluk MYO Asistanı", 
+    page_icon="balikesir_uni_icon.png", # Sekme ikonu olarak logonuzu kullanır
+    layout="wide"
+)
+# --- 0. UYGULAMA GENEL AYARLARI BİTİŞ ---
+
+
 # --- 1. ÖZEL BİLGİ KAYNAĞI (MYO Data) ---
 # Bilgileriniz aynen korunmuştur.
 MYO_BILGI_KAYNAGI = """
