@@ -8,10 +8,11 @@ import time
 import google.genai.errors 
 
 # --- 0. UYGULAMA GENEL AYARLARI (FAVICON VE SAYFA ADI) ---
-# Tarayıcı sekmesindeki ikon ve sayfa başlığını ayarlar
+# Tarayıcı sekmesindeki ikon, sayfa başlığı ve EKRAN GENİŞLİĞİ ayarlanır.
 st.set_page_config(
-    page_title="Altınoluk MYO Asistan", 
-    page_icon="balikesir_uni_icon.png", # Sekme ikonu olarak logonuzu kullanır
+    page_title="Altınoluk MYO Asistanı", 
+    page_icon="balikesir_uni_icon.png", 
+    layout="centered" # <<<<<< Dar, ortalanmış ekran modu
 )
 # --- 0. UYGULAMA GENEL AYARLARI BİTİŞ ---
 
@@ -96,8 +97,9 @@ def handle_special_query(client, prompt, model_name, myo_kaynagi, messages):
 SYSTEM_INSTRUCTION = (
     "Sen, Altınoluk Meslek Yüksekokulu Bilgisayar Programcılığı Bölümü'nü tanıtan yapay zeka asistanısın. "
     "Aşağıdaki 'BİLGİ KAYNAĞI' metnini kullanarak cevap ver. "
-    "**Subjektif ve yorum isteyen sorularda (Örn: Nasıl hissettirir?, Memnuniyet?),** verdiğin KAYNAK'taki verilere (Örn: Samimi ortam, birebir ilgi) dayanarak pozitif ve yapıcı bir çıkarım yap. "
-    "Konu dışı veya kaynakta olmayan soruları kibarca reddet."
+    "**Subjektif ve yorum isteyen sorularda (Örn: Nasıl hissettirir?, Altınoluk güzel mi?),** verdiğin KAYNAK'taki verilere (Örn: Samimi ortam, birebir ilgi, İskele mevkiinde yer alması, doğası) dayanarak **pozitif ve yapıcı bir çıkarım yaparak akıcı, detaylı ve ikna edici bir yorum üret.** "
+    "**Asla 'kaynakta yok' veya 'detaylı bilgi bulunmamaktadır' gibi cevaplar verme.** Eldeki bilgileri (konum, eğitmen kadrosu, okul iklimi vb.) kullanarak soruyu destekleyici şekilde yanıtla. "
+    "Konu dışı soruları kibarca reddet."
     "'BİLGİ KAYNAĞI' metnini analiz ederek soruya en iyi en güzel cevabı vericek şekilde analiz et ve en iyi sonucu ulaştır."
     "Sana sorulan soruyu BİLGİ KAYNAĞI'nda analiz ederek cevapla sorulan soruyu cevapsız bırakma elindeki bilgilere göre veri üretmelisin. sana sorduğu soruya göre NORMAL moda geçebilirsin ama konudan sapma."
     "**Not:** Eğer kullanıcı bir özetleme soruyorsa, bu isteği 'handle_special_query' fonksiyonunun ele aldığını unutma ve NORMAL cevap verme moduna geç."
@@ -109,6 +111,7 @@ SYSTEM_INSTRUCTION = (
 if "client" not in st.session_state:
     try:
         # API Anahtarını Streamlit secrets yapısından çekiyoruz.
+        # Bu anahtarın Streamlit Cloud'da "GEMINI_API_KEY" olarak tanımlı olması gerekir.
         API_KEY_VALUE = st.secrets["GEMINI_API_KEY"] 
         
         # İstemciyi sadece bir kez oluştur ve Session State'e kaydet
@@ -289,4 +292,3 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
     
     # Sayfanın tekrar çizilmesini sağlamak için
     st.rerun()
-
