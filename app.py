@@ -196,7 +196,7 @@ col1, col2 = st.columns([1, 6])
 
 with col1:
     try:
-        # LOGO GÖRSELİNİN ADI BURADA KULLANILDI (BALIKESİR ÜNİVERSİTESİ LOGOSU)
+        # BAŞLIK LOGOSU: Balıkesir Üniversitesi
         st.image("balikesir_uni_icon.png", width=70) 
     except FileNotFoundError:
         st.info("Logo dosyası (balikesir_uni_icon.png) bulunamadı. Lütfen GitHub'a yükleyin.")
@@ -211,8 +211,8 @@ with col2:
 # Geçmiş mesajları görüntüle
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"], 
-                         # İkonlar artık buradan kontrol ediliyor!
-                         avatar="🧑‍🎓" if message["role"] == "user" else "balikesir_uni_icon.png"): 
+                         # İKONLAR: Kullanıcı -> student_icon.png, Asistan -> balikesir_uni_icon.png
+                         avatar="student_icon.png" if message["role"] == "user" else "balikesir_uni_icon.png"): 
         st.markdown(message["content"])
 
         # Sadece asistan mesajlarında ses butonu göster
@@ -238,7 +238,7 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
     st.session_state.last_response_index = -1
     
     # Kullanıcı mesajını ekrana yaz ve messages listesine ekle
-    with st.chat_message("user", avatar="🧑‍🎓"): # İkon buradan kontrol ediliyor
+    with st.chat_message("user", avatar="student_icon.png"): # İKON: student_icon.png
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -273,7 +273,7 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
             bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
 
     # Bot cevabını ekrana yaz
-    with st.chat_message("assistant", avatar="balikesir_uni_icon.png"): # İkon buradan kontrol ediliyor
+    with st.chat_message("assistant", avatar="balikesir_uni_icon.png"): # İKON: balikesir_uni_icon.png
         st.markdown(bot_response)
         
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
