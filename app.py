@@ -1,4 +1,5 @@
 import os
+import base64
 import streamlit as st
 from google import genai
 from google.genai import types 
@@ -229,3 +230,83 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
     
     # Sayfanın tekrar çizilmesini sağlamak için
     st.rerun()
+
+MYO_LOGO_FILE_NAME = "favicon.png" # <--- BURAYI LOGO DOSYANIZIN ADINA GÖRE GÜNCELLEYİN!
+# Favicon olarak kullandığınız ikon dosyasını da buraya yazabilirsiniz.
+
+st.markdown(f"""
+<style>
+/* Sol üstteki menü ve Streamlit yazısını gizler (Önceki çözüm) */
+.css-1jc2h0i {{ visibility: hidden; }}
+
+/* ------------------------------------------------------------- */
+/* MESSAGES (Sohbet Baloncuğu) KİŞİSELLEŞTİRMESİ (Önceki ayarlarınız) */
+/* ------------------------------------------------------------- */
+
+/* USER (Kullanıcı) Mesaj Baloncuğu Arka Plan Rengi (Beyaz/Açık Gri) */
+.stChatMessage:nth-child(odd) {{ 
+    background-color: #FFFFFF !important; 
+    border-left: 5px solid #003366; 
+    border-radius: 0.5rem;
+    padding: 10px;
+    margin-bottom: 10px;
+}}
+
+/* ASSISTANT (Asistan) Mesaj Baloncuğu Arka Plan Rengi (Kurumsal Açık Mavi) */
+.stChatMessage:nth-child(even) {{ 
+    background-color: #E0EFFF !important; 
+    border-left: 5px solid #003366; 
+    border-radius: 0.5rem;
+    padding: 10px;
+    margin-bottom: 10px;
+}}
+
+/* ------------------------------------------------------------- */
+/* İKON DEĞİŞTİRME - GÖRSEL DOSYASI İLE */
+/* ------------------------------------------------------------- */
+
+/* KULLANICI İKONU (Öğrenci Emojisi) */
+.stChatMessage [data-testid="stChatMessageAvatar-user"] svg {{
+    display: none; /* Streamlit'in varsayılan ikonunu gizle */
+}}
+.stChatMessage [data-testid="stChatMessageAvatar-user"] {{
+    content: "🧑‍🎓"; /* Kullanıcı İkonu (Emoji) */
+    font-size: 1.5rem;
+    line-height: 1; /* Emoji'nin daha iyi hizalanması için */
+    display: flex; /* İçeriği ortalamak için */
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* İkonun genişliğini ayarla */
+    height: 40px; /* İkonun yüksekliğini ayarla */
+    border-radius: 50%; /* Yuvarlak ikon */
+    background-color: #F0F2F9; /* Arka plan rengi */
+}}
+
+/* ASİSTAN İKONU (ALTINOLUK MYO LOGOSU) */
+.stChatMessage [data-testid="stChatMessageAvatar-assistant"] svg {{
+    display: none; /* Streamlit'in varsayılan ikonunu gizle */
+}}
+.stChatMessage [data-testid="stChatMessageAvatar-assistant"] {{
+    /* Logo dosyasını arka plan resmi olarak ayarla */
+    background-image: url('data:image/png;base64,{base64.b64encode(open(MYO_LOGO_FILE_NAME, "rb").read()).decode()}'); /* Logoyu base64 olarak ekle */
+    background-size: cover; /* Logoyu ikon kutusuna sığdır */
+    background-position: center; /* Logoyu ortala */
+    background-repeat: no-repeat; /* Tekrar etme */
+    border-radius: 50%; /* Yuvarlak ikon için */
+    width: 40px; /* İkonun genişliği */
+    height: 40px; /* İkonun yüksekliği */
+    border: 2px solid #003366; /* Kurumsal mavi çerçeve */
+    display: flex; /* Flexbox özellikleri */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Taşmayı engelle */
+    content: ""; /* Boş içerik, resim için */
+}}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+
+
+
