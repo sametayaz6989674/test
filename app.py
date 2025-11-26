@@ -10,9 +10,8 @@ import google.genai.errors
 # --- 0. UYGULAMA GENEL AYARLARI (FAVICON VE SAYFA ADI) ---
 # Tarayıcı sekmesindeki ikon ve sayfa başlığını ayarlar
 st.set_page_config(
-    page_title="Altınoluk MYO Asistanı", 
+    page_title="Altınoluk MYO Asistan", 
     page_icon="balikesir_uni_icon.png", # Sekme ikonu olarak logonuzu kullanır
-    layout="wide"
 )
 # --- 0. UYGULAMA GENEL AYARLARI BİTİŞ ---
 
@@ -290,3 +289,4 @@ if prompt := st.chat_input("Altınoluk,Altınoluk MYO hakkında sorunuz nedir?")
     
     # Sayfanın tekrar çizilmesini sağlamak için
     st.rerun()
+
