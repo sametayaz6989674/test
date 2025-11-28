@@ -50,7 +50,7 @@ def generate_audio(text):
 
 def handle_special_query(client, prompt, model_name, myo_kaynagi, messages):
     classification_prompt = (
-        "Kullanıcının isteği sadece 'özetleme' mi ('bilgileri özetle', 'kısalt' vb.)? Eğer öyleyse SADECE 'OZETLE' kelimesini döndür. "
+        "Kullanıcının isteği sadece 'özetleme' mi? Eğer öyleyse SADECE 'OZETLE' kelimesini döndür. "
         "Aksi halde SADECE 'NORMAL' kelimesini döndür. "
         f"Kullanıcı İsteği: '{prompt}'"
     )
@@ -103,30 +103,37 @@ if "messages" not in st.session_state: st.session_state.messages = []
 if "history" not in st.session_state: st.session_state.history = []
 if "last_response_index" not in st.session_state: st.session_state.last_response_index = -1
 if "audio_button_pressed" not in st.session_state: st.session_state.audio_button_pressed = False
-# Giriş yönetimi için state
 if 'user_prompt_content' not in st.session_state: st.session_state.user_prompt_content = None
 
 def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
-# Metin kutusu 'on_change' fonksiyonu
 def submit_text():
     st.session_state.user_prompt_content = st.session_state.widget_input
-    st.session_state.widget_input = "" # Kutuyu temizle
+    st.session_state.widget_input = "" 
 
-# --- 4. CSS STİLİ (SOL/SAĞ DÜZENİ) ---
+def submit_click():
+    """Gönder butonuna tıklayınca çalışır"""
+    if st.session_state.widget_input:
+        st.session_state.user_prompt_content = st.session_state.widget_input
+        st.session_state.widget_input = ""
+
+# --- 4. CSS STİLİ (ÇİZGİLER SOLDA) ---
 st.markdown("""
 <style>
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SAĞA YASLI + SAĞ ÇİZGİ) */
+/* KULLANICI MESAJI (SAĞA YASLI + SOL ÇİZGİ) */
 .stChatMessage:nth-child(odd) { 
     flex-direction: row-reverse; 
     text-align: right; 
     background-color: #FFFFFF !important; 
-    border-right: 5px solid #003366 !important; 
-    border-left: none !important; 
+    
+    /* ÇİZGİ DÜZELTİLDİ: Artık Solda */
+    border-left: 5px solid #003366 !important; 
+    border-right: none !important; 
+    
     border-radius: 10px 0px 10px 10px; 
 }
 .stChatMessage:nth-child(odd) div[data-testid="stMarkdownContainer"] {
@@ -167,10 +174,9 @@ with col1:
         st.header("🎓") 
 with col2:
     st.title("Altınoluk MYO Bilgisayar Programcılığı Asistanı")
-    st.caption("Bu chatbot, özetleme ve isteğe bağlı sesli geri bildirim özelliğine sahiptir.")
     st.caption("📌 **Kullanım Amacı:** Bu Yapay Zeka Asistanı, sadece **Altınoluk MYO** ve **Bilgisayar Programcılığı Bölümü** hakkındaki verilere dayanarak cevap üretir.")
 
-# --- 6. MESAJ GEÇMİŞİ ---
+# --- 6. MESAJ GEÇMİŞİNİ GÖSTER ---
 for i, message in enumerate(st.session_state.messages):
     avatar_icon = "student_icon.png" if message["role"] == "user" else "balikesir_uni_icon.png"
     
@@ -186,14 +192,13 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("🔊 Sesli Dinle", key=f"play_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# --- 7. GİRİŞ ALANI (YAN YANA MİKROFON VE METİN) ---
-st.markdown("---") # Ayırıcı çizgi
+# --- 7. GİRİŞ ALANI (MİKROFON, YAZI, GÖNDER BUTONU) ---
+st.markdown("---") 
 
-# İşlenecek prompt'u belirle
 final_prompt = None
 
-# Yan yana kolonlar: %15 Mikrofon, %85 Yazı alanı
-mic_col, text_col = st.columns([1, 6])
+# Yan yana 3 kolon: Mikrofon (%10), Yazı Alanı (%80), Gönder Butonu (%10)
+mic_col, text_col, btn_col = st.columns([1, 8, 1])
 
 with mic_col:
     # Mikrofon butonu
@@ -207,7 +212,7 @@ with mic_col:
     )
 
 with text_col:
-    # Yazı alanı (Enter'a basınca 'submit_text' çalışır)
+    # Yazı alanı (Enter ile gönderir)
     st.text_input(
         label="Mesajınızı yazın",
         placeholder="Sorunuzu buraya yazın...", 
@@ -216,25 +221,25 @@ with text_col:
         label_visibility="collapsed"
     )
 
+with btn_col:
+    # Gönder butonu (Posta işareti)
+    st.button("➤", on_click=submit_click, use_container_width=True)
+
 # --- 8. İŞLEM MANTIĞI ---
 
-# Kaynaklardan gelen veriyi kontrol et (Mikrofon mu, Yazı mı?)
 if st.session_state.user_prompt_content:
     final_prompt = st.session_state.user_prompt_content
-    st.session_state.user_prompt_content = None # İşlendikten sonra sil
+    st.session_state.user_prompt_content = None 
 
 elif text_from_mic:
     final_prompt = text_from_mic
 
-# Eğer geçerli bir giriş varsa işlemi başlat
 if final_prompt:
     st.session_state.audio_button_pressed = False
     st.session_state.last_response_index = -1
     
-    # Kullanıcı mesajını ekle
     st.session_state.messages.append({"role": "user", "content": final_prompt})
     
-    # Asistan cevabını oluştur
     special_content, is_special = handle_special_query(client, final_prompt, st.session_state.model_name, MYO_BILGI_KAYNAGI, st.session_state.messages)
 
     with st.spinner("Asistan düşünüyor..."):
@@ -259,7 +264,6 @@ if final_prompt:
         except Exception as e:
             bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
 
-    # Bot cevabını ekle
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     st.rerun()
