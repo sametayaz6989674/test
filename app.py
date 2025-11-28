@@ -6,7 +6,7 @@ from gtts import gTTS
 import io 
 import time
 import google.genai.errors 
-# GÜNCELLEME: mic_recorder yerine speech_to_text kullanıyoruz (Daha stabil)
+# Sesli giriş için
 from streamlit_mic_recorder import speech_to_text
 
 # --- 0. UYGULAMA GENEL AYARLARI ---
@@ -16,7 +16,7 @@ st.set_page_config(
     layout="centered" 
 )
 
-# --- 1. ÖZEL BİLGİ KAYNAĞI ---
+# --- 1. ÖZEL BİLGİ KAYNAĞI (MYO Data) ---
 MYO_BILGI_KAYNAGI = """
 ### ALTINOLUK MESLEK YÜKSEKOKULU BİLGİ BANKASI ###
 * **Bölümler:** Altınoluk MYO'da toplam **3 bölüm** bulunmaktadır: Bilgisayar Programcılığı, Bitkisel ve Hayvansal Üretim Bölümü, ve Kimya ve Kimyasal İşleme Teknolojileri Bölümü.
@@ -124,42 +124,57 @@ def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
-# --- 4. CSS STİLİ ---
+# --- 4. CSS STİLİ (DÜZELTİLDİ: ÇİZGİ YÖNLERİ) ---
 st.markdown("""
 <style>
+/* Menüyü gizle */
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SAĞDA) */
+/* ------------------------------------------- */
+/* KULLANICI MESAJI (SAĞDA + SAĞ ÇİZGİ) */
+/* ------------------------------------------- */
 .stChatMessage:nth-child(odd) { 
     flex-direction: row-reverse; 
     text-align: right; 
     background-color: #FFFFFF !important; 
-    border-right: 5px solid #003366; 
+    
+    /* ÇİZGİ AYARI: Sağda olsun, Solda olmasın */
+    border-right: 5px solid #003366 !important; 
     border-left: none !important; 
+    
     border-radius: 10px 0px 10px 10px; 
 }
+/* Kullanıcı mesaj içeriğini sağa yasla */
 .stChatMessage:nth-child(odd) div[data-testid="stMarkdownContainer"] {
     text-align: right !important;
 }
+/* Kullanıcı ikonu */
 .stChatMessage:nth-child(odd) [data-testid="stChatMessageAvatar-user"] {
     background-color: #708090 !important; 
     margin-left: 10px; margin-right: 0px;
 }
 
-/* ASİSTAN MESAJI (SOLDA) */
+/* ------------------------------------------- */
+/* ASİSTAN MESAJI (SOLDA + SOL ÇİZGİ) */
+/* ------------------------------------------- */
 .stChatMessage:nth-child(even) { 
     flex-direction: row; 
     text-align: left; 
     background-color: #E0EFFF !important; 
-    border-left: 5px solid #003366; 
+    
+    /* ÇİZGİ AYARI: Solda olsun, Sağda olmasın */
+    border-left: 5px solid #003366 !important; 
     border-right: none !important;
+    
     border-radius: 0px 10px 10px 10px; 
 }
+/* Asistan ikonu */
 .stChatMessage:nth-child(even) [data-testid="stChatMessageAvatar-assistant"] {
     background-color: #003366 !important; 
     margin-right: 10px; 
 }
 
+/* Gölge Efektleri */
 .css-1v0609 { box-shadow: 0 4px 8px rgba(0, 51, 102, 0.2); border-radius: 12px; }
 .stButton>button { box-shadow: 0 2px 4px rgba(0, 51, 102, 0.1); }
 </style>
@@ -207,9 +222,7 @@ with st.container():
     col_mic, col_text = st.columns([1, 5])
     
     with col_mic:
-        # HATA DÜZELTMESİ BURADA:
-        # mic_recorder yerine speech_to_text kullanıyoruz.
-        # Bu fonksiyon sesi alır, metne çevirir ve döndürür. Callback veya state karmaşası yok.
+        # Sesli giriş butonu
         text_from_mic = speech_to_text(
             language='tr',
             start_prompt="🎙️",
@@ -226,7 +239,7 @@ with st.container():
     with col_text:
         # Eğer sesli giriş yoksa normal input'u göster
         if not prompt:
-            prompt = st.chat_input("Sorunuzu buraya yazın veya mikrofona konuşun...")
+            prompt = st.chat_input("Sorunuzu buraya yazın veya soldaki butona basarak konuşun...")
 
 # --- 7. İŞLEM ---
 if prompt:
