@@ -64,7 +64,7 @@ def handle_special_query(client, prompt, model_name, myo_kaynagi, messages):
         if len(messages) >= 2 and messages[-2]["role"] == "assistant":
             last_bot_response = messages[-2]["content"]
         
-        if last_bot_response and len(last_bot_response) > 50:
+        if last_bot_response and len(last_bot_response.replace('#', '').replace('*', '')) > 50:
             ozet_prompt = f"Kullanıcı, ona verdiğin son cevabı özetlemeni istiyor. Aşağıdaki metni kısaca özetle: \n\nMETİN: {last_bot_response}"
         else:
             ozet_prompt = f"Kullanıcı Altınoluk MYO hakkında genel bir özet istedi. Aşağıdaki metni özetle:\n\n{myo_kaynagi}"
@@ -103,19 +103,18 @@ if "messages" not in st.session_state: st.session_state.messages = []
 if "history" not in st.session_state: st.session_state.history = []
 if "last_response_index" not in st.session_state: st.session_state.last_response_index = -1
 if "audio_button_pressed" not in st.session_state: st.session_state.audio_button_pressed = False
-# temp_mic_text session state'i kullanıyoruz
 if 'temp_mic_text' not in st.session_state: st.session_state.temp_mic_text = None
 
 def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
-# --- 4. CSS STİLİ (HER ŞEY SOLDA - DÜZENLİ) ---
+# --- 4. CSS STİLİ (SOLDA) ---
 st.markdown("""
 <style>
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SOLDA) */
+/* KULLANICI MESAJI (SOLDA + SOL ÇİZGİ) */
 .stChatMessage:nth-child(odd) { 
     flex-direction: row; 
     text-align: left; 
@@ -132,7 +131,7 @@ st.markdown("""
     margin-right: 10px; 
 }
 
-/* ASİSTAN MESAJI (SOLDA) */
+/* ASİSTAN MESAJI (SOLDA + SOL ÇİZGİ) */
 .stChatMessage:nth-child(even) { 
     flex-direction: row; 
     text-align: left; 
@@ -146,7 +145,6 @@ st.markdown("""
     margin-right: 10px; 
 }
 
-/* Buton ve Konteyner Ayarları */
 .stButton>button { box-shadow: 0 2px 4px rgba(0, 51, 102, 0.1); }
 </style>
 """, unsafe_allow_html=True)
@@ -160,7 +158,7 @@ with col1:
     except FileNotFoundError:
         st.header("🎓") 
 with col2:
-    st.title("Altınoluk MYO Asistanı")
+    st.title("Altınoluk MYO Bilgisayar Programcılığı Asistanı")
     st.caption("📌 **Kullanım Amacı:** Bu Yapay Zeka Asistanı, sadece **Altınoluk MYO** ve **Bilgisayar Programcılığı Bölümü** hakkındaki verilere dayanarak cevap üretir.")
 
 # --- 6. MESAJ GEÇMİŞİNİ GÖSTER ---
@@ -179,21 +177,20 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("🔊 Sesli Dinle", key=f"play_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# --- 7. GİRİŞ ALANI (MIKROFON + CHAT INPUT) ---
-st.markdown("---") 
+# --- 7. GİRİŞ ALANI (MIKROFON SOLDA VE ÜSTTE) ---
+prompt = None 
 
-prompt = None
-
-# Sesli giriş için değişkeni kontrol et
 if st.session_state.temp_mic_text:
     prompt = st.session_state.temp_mic_text
     st.session_state.temp_mic_text = None
 
-# 1. Mikrofon Butonu (Chat Input'un Üstünde)
+# GİRİŞ ALANINI YÖNETEN KONTEYNER
 with st.container():
-    # Mikrofonu ortalamak için kolon kullanalım
-    c1, c2, c3 = st.columns([1, 2, 1])
-    with c2:
+    st.markdown("---") # Ayırıcı
+    
+    # 1. Mikrofon Butonu (Sola Yaslı, Girişin Üstünde)
+    c_mic, c_bos = st.columns([1, 3]) # Sol sütun (mikrofon) dar, sağ sütun boş
+    with c_mic:
         text_from_mic = speech_to_text(
             language='tr',
             start_prompt="🎙️ Sesli Konuşmak İçin Tıkla",
@@ -202,24 +199,22 @@ with st.container():
             key='STT',
             use_container_width=True
         )
+    
+    if text_from_mic:
+        st.session_state.temp_mic_text = text_from_mic
+        st.rerun()
 
-if text_from_mic:
-    st.session_state.temp_mic_text = text_from_mic
-    st.rerun()
-
-# 2. Standart Chat Input (En Altta, Çift Mesajı Önler)
-if not prompt:
-    prompt = st.chat_input("Sorunuzu buraya yazın...")
+    # 2. Yazılı Giriş (En Altta, Tam Genişlik)
+    if not prompt:
+        prompt = st.chat_input("Sorunuzu buraya yazın...")
 
 # --- 8. İŞLEM MANTIĞI ---
 if prompt:
     st.session_state.audio_button_pressed = False
     st.session_state.last_response_index = -1
     
-    # Kullanıcı mesajını ekle
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    # İşlemi başlat
     special_content, is_special = handle_special_query(client, prompt, st.session_state.model_name, MYO_BILGI_KAYNAGI, st.session_state.messages)
 
     with st.spinner("Asistan düşünüyor..."):
@@ -244,7 +239,6 @@ if prompt:
         except Exception as e:
             bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
 
-    # Bot cevabını ekle
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     st.rerun()
