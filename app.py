@@ -64,7 +64,7 @@ def handle_special_query(client, prompt, model_name, myo_kaynagi, messages):
         if len(messages) >= 2 and messages[-2]["role"] == "assistant":
             last_bot_response = messages[-2]["content"]
         
-        if last_bot_response and len(last_bot_response.replace('#', '').replace('*', '')) > 50:
+        if last_bot_response and len(last_bot_response) > 50:
             ozet_prompt = f"Kullanıcı, ona verdiğin son cevabı özetlemeni istiyor. Aşağıdaki metni kısaca özetle: \n\nMETİN: {last_bot_response}"
         else:
             ozet_prompt = f"Kullanıcı Altınoluk MYO hakkında genel bir özet istedi. Aşağıdaki metni özetle:\n\n{myo_kaynagi}"
@@ -114,46 +114,50 @@ def submit_text():
     st.session_state.widget_input = "" 
 
 def submit_click():
-    """Gönder butonuna tıklayınca çalışır"""
     if st.session_state.widget_input:
         st.session_state.user_prompt_content = st.session_state.widget_input
         st.session_state.widget_input = ""
 
-# --- 4. CSS STİLİ (ÇİZGİLER SOLDA) ---
+# --- 4. CSS STİLİ (HEPSİ SOLDA) ---
 st.markdown("""
 <style>
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SAĞA YASLI + SOL ÇİZGİ) */
+/* KULLANICI MESAJI (SOLDA) */
 .stChatMessage:nth-child(odd) { 
-    flex-direction: row-reverse; 
-    text-align: right; 
+    flex-direction: row; /* Normal Akış: İkon Solda */
+    text-align: left;    /* Metin Sola Yaslı */
     background-color: #FFFFFF !important; 
     
-    /* ÇİZGİ DÜZELTİLDİ: Artık Solda */
+    /* ÇİZGİ: SOLDA */
     border-left: 5px solid #003366 !important; 
     border-right: none !important; 
     
-    border-radius: 10px 0px 10px 10px; 
+    border-radius: 0.5rem; 
 }
+/* Kullanıcı mesaj içeriği */
 .stChatMessage:nth-child(odd) div[data-testid="stMarkdownContainer"] {
-    text-align: right !important;
-    margin-right: 10px;
+    text-align: left !important;
 }
+/* Kullanıcı ikonu */
 .stChatMessage:nth-child(odd) [data-testid="stChatMessageAvatar-user"] {
     background-color: #708090 !important; 
-    margin-left: 10px; margin-right: 0px;
+    margin-right: 10px; /* İkon ile metin arası boşluk */
 }
 
-/* ASİSTAN MESAJI (SOLA YASLI + SOL ÇİZGİ) */
+/* ASİSTAN MESAJI (SOLDA) */
 .stChatMessage:nth-child(even) { 
-    flex-direction: row; 
+    flex-direction: row; /* Normal Akış: İkon Solda */
     text-align: left; 
     background-color: #E0EFFF !important; 
+    
+    /* ÇİZGİ: SOLDA */
     border-left: 5px solid #003366 !important; 
     border-right: none !important; 
-    border-radius: 0px 10px 10px 10px; 
+    
+    border-radius: 0.5rem; 
 }
+/* Asistan İkonu */
 .stChatMessage:nth-child(even) [data-testid="stChatMessageAvatar-assistant"] {
     background-color: #003366 !important; 
     margin-right: 10px; 
@@ -176,7 +180,7 @@ with col2:
     st.title("Altınoluk MYO Bilgisayar Programcılığı Asistanı")
     st.caption("📌 **Kullanım Amacı:** Bu Yapay Zeka Asistanı, sadece **Altınoluk MYO** ve **Bilgisayar Programcılığı Bölümü** hakkındaki verilere dayanarak cevap üretir.")
 
-# --- 6. MESAJ GEÇMİŞİNİ GÖSTER ---
+# --- 6. MESAJ GEÇMİŞİ ---
 for i, message in enumerate(st.session_state.messages):
     avatar_icon = "student_icon.png" if message["role"] == "user" else "balikesir_uni_icon.png"
     
@@ -192,7 +196,7 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("🔊 Sesli Dinle", key=f"play_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# --- 7. GİRİŞ ALANI (MİKROFON, YAZI, GÖNDER BUTONU) ---
+# --- 7. GİRİŞ ALANI (YAN YANA DÜZEN) ---
 st.markdown("---") 
 
 final_prompt = None
@@ -201,7 +205,6 @@ final_prompt = None
 mic_col, text_col, btn_col = st.columns([1, 8, 1])
 
 with mic_col:
-    # Mikrofon butonu
     text_from_mic = speech_to_text(
         language='tr',
         start_prompt="🎙️",
@@ -212,7 +215,6 @@ with mic_col:
     )
 
 with text_col:
-    # Yazı alanı (Enter ile gönderir)
     st.text_input(
         label="Mesajınızı yazın",
         placeholder="Sorunuzu buraya yazın...", 
@@ -222,7 +224,6 @@ with text_col:
     )
 
 with btn_col:
-    # Gönder butonu (Posta işareti)
     st.button("➤", on_click=submit_click, use_container_width=True)
 
 # --- 8. İŞLEM MANTIĞI ---
