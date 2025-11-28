@@ -28,8 +28,7 @@ MYO_BILGI_KAYNAGI = """
 * **Okul Eğlence Hobi Yemek:** Okulumuzun Yemekhanesi mevcuttur öğrenciler 40 TL karşlığında yemek yiyebilir. Okulumuzda kantin mevcuttur voleybol sahası vardır öğrencilerin masa tenisi oynayabileceği alan mevcuttur. okulumuzun kütüphanesi mevcuttur ders çalışmak için veya araştırma yapmak için öğrenciler kullanabilir. okul bahçesi güvenlidir her saat güvenlik kapıda beklemektedir. öğrencilere öğrenci kartı verilmektedir(sınavlarda öğrenci kartları masalara koyulur) okulumuzun konferans salonu mevcuttur 
 * **Akademik Takvim:** [Akademik takvim detayları korunmuştur.]
 * **İdari Kadro:** Ersin KOCABIYIK Yüksekokul Sekreteri, Fatma ÖZKUL Şef, Hüseyin Çağrı ÖZSU Bilgisayar İşletmeni, Emre Selman CANIAZ Bilgisayar Programcılığı Danışmanı,
-* **Okul iletişim:**Adres: İskele, Atatürk Cd. No:103, 10870 Edremit/Balıkesir okulun tam adresi bu ve Telefon: (0266) 396 15 52 hafta için 08.00 17.00 arası açık hafta sonu kapalı. Okul'un toplam öğrenci sayısı 352'dir. Geçme Notu için Sınavlarda Vizenin %40 ı finalin %60 ı alınmaktadır. Finalden Kesinlikle 50 ve üstü not almanız gerekmektedir. vize ve finalin ortalaması alınıdğında 45 ve üstü ise o dersi geçersiniz.okulda çan sistemi bulunmamaktadır. Okulda okuyan öğrencilerin bir kısmı apart tutmaktadır veya daire kiralıyor konaklama imkanı için yada edremitte mevcut olan KYK KIZ KYK ERKEK yurtlarında kalmaktadır. Okulun TYT giriş puanı bu sene 2025 YÖKATLAS ın paylaştığı verilere göre 317,14553 Yerleşen son kişinin başarı sırası 662.855 tir. Yerleşenlerin ortalama diploma notı 77.8 dir.
-** Öğretmen İletişim:**Okuldaki öğretmenlerin iletişim bilgileri Tuğba Küçükseyhan Mail adresi kucukseyhan@balikesir.edu.tr , Emre Selman CANIAZ mail adresi escaniaz@balikesir.edu.tr , Aykut Durgut Mail Adresi adurgut@balikesir.edu.tr , Cenk Paşa Mail Adresi cpasa@balikesir.edu.tr , Ali Erfidan Mail adresi ali.erfidan@balikesir.edu.tr , 
+* **Okul iletişim:**Adres: İskele, Atatürk Cd. No:103, 10870 Edremit/Balıkesir okulun tam adresi bu ve Telefon: (0266) 396 15 52 hafta için 08.00 17.00 arası açık hafta sonu kapalı.
 * **Altınoluk Meslek Yüksek Okulu Müdür:** [Müdür konuşması korunmuştur.]
 * **Altınoluk Meslek Yüksek Okulu imkanları:** [İmkan detayları korunmuştur.]
 * **Bu okul hakkında bilgi ver:** [Genel okul bilgileri korunmuştur.]
@@ -119,52 +118,42 @@ def submit_click():
         st.session_state.user_prompt_content = st.session_state.widget_input
         st.session_state.widget_input = ""
 
-# --- 4. CSS STİLİ (HEPSİ SOLDA) ---
+# --- 4. CSS STİLİ (SOLDA) ---
 st.markdown("""
 <style>
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SOLDA) */
+/* KULLANICI MESAJI (SOLDA + SOL ÇİZGİ) */
 .stChatMessage:nth-child(odd) { 
-    flex-direction: row; /* Normal Akış: İkon Solda */
-    text-align: left;    /* Metin Sola Yaslı */
+    flex-direction: row; 
+    text-align: left; 
     background-color: #FFFFFF !important; 
-    
-    /* ÇİZGİ: SOLDA */
     border-left: 5px solid #003366 !important; 
     border-right: none !important; 
-    
     border-radius: 0.5rem; 
 }
-/* Kullanıcı mesaj içeriği */
 .stChatMessage:nth-child(odd) div[data-testid="stMarkdownContainer"] {
     text-align: left !important;
 }
-/* Kullanıcı ikonu */
 .stChatMessage:nth-child(odd) [data-testid="stChatMessageAvatar-user"] {
     background-color: #708090 !important; 
-    margin-right: 10px; /* İkon ile metin arası boşluk */
+    margin-right: 10px; 
 }
 
-/* ASİSTAN MESAJI (SOLDA) */
+/* ASİSTAN MESAJI (SOLDA + SOL ÇİZGİ) */
 .stChatMessage:nth-child(even) { 
-    flex-direction: row; /* Normal Akış: İkon Solda */
+    flex-direction: row; 
     text-align: left; 
     background-color: #E0EFFF !important; 
-    
-    /* ÇİZGİ: SOLDA */
     border-left: 5px solid #003366 !important; 
     border-right: none !important; 
-    
     border-radius: 0.5rem; 
 }
-/* Asistan İkonu */
 .stChatMessage:nth-child(even) [data-testid="stChatMessageAvatar-assistant"] {
     background-color: #003366 !important; 
     margin-right: 10px; 
 }
 
-/* BUTONLAR */
 .stButton>button { box-shadow: 0 2px 4px rgba(0, 51, 102, 0.1); }
 </style>
 """, unsafe_allow_html=True)
@@ -181,7 +170,7 @@ with col2:
     st.title("Altınoluk MYO Bilgisayar Programcılığı Asistanı")
     st.caption("📌 **Kullanım Amacı:** Bu Yapay Zeka Asistanı, sadece **Altınoluk MYO** ve **Bilgisayar Programcılığı Bölümü** hakkındaki verilere dayanarak cevap üretir.")
 
-# --- 6. MESAJ GEÇMİŞİ ---
+# --- 6. MESAJ GEÇMİŞİNİ GÖSTER ---
 for i, message in enumerate(st.session_state.messages):
     avatar_icon = "student_icon.png" if message["role"] == "user" else "balikesir_uni_icon.png"
     
@@ -197,13 +186,13 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("🔊 Sesli Dinle", key=f"play_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# --- 7. GİRİŞ ALANI (YAN YANA DÜZEN) ---
+# --- 7. GİRİŞ ALANI (YAN YANA MİKROFON VE METİN) ---
 st.markdown("---") 
 
 final_prompt = None
 
-# Yan yana 3 kolon: Mikrofon (%10), Yazı Alanı (%80), Gönder Butonu (%10)
-mic_col, text_col, btn_col = st.columns([1, 8, 1])
+# Yan yana kolonlar: %15 Mikrofon, %75 Yazı alanı, %10 Gönder
+mic_col, text_col, btn_col = st.columns([1.5, 7.5, 1])
 
 with mic_col:
     text_from_mic = speech_to_text(
@@ -227,8 +216,7 @@ with text_col:
 with btn_col:
     st.button("➤", on_click=submit_click, use_container_width=True)
 
-
-
+# --- 8. İŞLEM MANTIĞI ---
 
 if st.session_state.user_prompt_content:
     final_prompt = st.session_state.user_prompt_content
@@ -270,8 +258,3 @@ if final_prompt:
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     st.rerun()
-
-
-
-
-
