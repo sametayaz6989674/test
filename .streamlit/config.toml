@@ -1,1 +1,7 @@
 
+[theme]
+primaryColor="#003366"      # Butonlar ve vurgular için Koyu Mavi/Lacivert
+backgroundColor="#F0F2F9"   # Açık Gri arka plan
+secondaryBackgroundColor="#FFFFFF" # Beyaz yan çubuk/kod blokları
+textColor="#262730"         # Koyu yazı rengi
+font="sans serif"
