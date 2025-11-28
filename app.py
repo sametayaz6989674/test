@@ -124,34 +124,35 @@ def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
-# --- 4. CSS STİLİ (DÜZELTİLDİ: HER ŞEY SOLDA) ---
+# --- 4. CSS STİLİ (DÜZELTİLDİ: BOT SOL, KULLANICI SAĞ) ---
 st.markdown("""
 <style>
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SOLDA + SOL ÇİZGİ) */
+/* KULLANICI MESAJI (SAĞDA) */
 .stChatMessage:nth-child(odd) { 
-    flex-direction: row; /* Normal akış (Soldan sağa) */
-    text-align: left; 
+    flex-direction: row-reverse; 
+    text-align: right; 
     background-color: #FFFFFF !important; 
     
-    /* ÇİZGİ: SOLDA */
-    border-left: 5px solid #003366 !important; 
-    border-right: none !important;
+    /* ÇİZGİ: SAĞDA */
+    border-right: 5px solid #003366 !important; 
+    border-left: none !important; 
     
-    border-radius: 0.5rem; 
+    border-radius: 10px 0px 10px 10px; 
 }
-/* Kullanıcı mesaj içeriğini sola yasla */
+/* Kullanıcı mesaj içeriğini sağa yasla */
 .stChatMessage:nth-child(odd) div[data-testid="stMarkdownContainer"] {
-    text-align: left !important;
+    text-align: right !important;
+    margin-right: 10px;
 }
 /* Kullanıcı ikonu */
 .stChatMessage:nth-child(odd) [data-testid="stChatMessageAvatar-user"] {
     background-color: #708090 !important; 
-    margin-right: 10px;
+    margin-left: 10px; margin-right: 0px;
 }
 
-/* ASİSTAN MESAJI (SOLDA + SOL ÇİZGİ) */
+/* ASİSTAN MESAJI (SOLDA) */
 .stChatMessage:nth-child(even) { 
     flex-direction: row; 
     text-align: left; 
@@ -161,12 +162,19 @@ st.markdown("""
     border-left: 5px solid #003366 !important; 
     border-right: none !important;
     
-    border-radius: 0.5rem; 
+    border-radius: 0px 10px 10px 10px; 
 }
 /* Asistan İkonu */
 .stChatMessage:nth-child(even) [data-testid="stChatMessageAvatar-assistant"] {
     background-color: #003366 !important; 
     margin-right: 10px; 
+}
+
+/* MİKROFON BUTONU STİLİ (Ortalanmış ve Şık) */
+.mic-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
 .css-1v0609 { box-shadow: 0 4px 8px rgba(0, 51, 102, 0.2); border-radius: 12px; }
@@ -203,32 +211,36 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("🔊 Sesli Dinle", key=f"play_audio_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# --- 7. GİRİŞ ALANI (SES + YAZI - YERLEŞİM DÜZELTİLDİ) ---
+# --- 7. GİRİŞ ALANI (SES + YAZI - SABİTLENDİ) ---
 prompt = None 
 
 if st.session_state.temp_mic_text:
     prompt = st.session_state.temp_mic_text
     st.session_state.temp_mic_text = None
 
-# Yazılı giriş alanı (Standart yerinde)
-if not prompt:
-    prompt = st.chat_input("Sorunuzu buraya yazın...")
+# Giriş alanları için bir konteyner oluşturup alt kısma ekliyoruz
+input_container = st.container()
 
-# Mikrofon butonu (Girişin hemen altına, sola yaslı)
-with st.container():
-    # Mikrofon butonu
-    text_from_mic = speech_to_text(
-        language='tr',
-        start_prompt="🎙️ Sesli Konuşmak İçin Tıkla", # Buton içi metin
-        stop_prompt="⏹️ Göndermek İçin Tıkla",
-        just_once=True,
-        key='STT',
-        use_container_width=False # Tam genişlik kaplamasın
-    )
+with input_container:
+    # 1. Mikrofon Butonu (Ortalanmış ve Chat Input'un Hemen Üstünde)
+    col_left, col_center, col_right = st.columns([1, 2, 1])
+    with col_center:
+        text_from_mic = speech_to_text(
+            language='tr',
+            start_prompt="🎙️ Sesli Soru Sormak İçin Tıkla", # Buton içi metin
+            stop_prompt="⏹️ Göndermek İçin Tıkla",
+            just_once=True,
+            key='STT',
+            use_container_width=True
+        )
     
     if text_from_mic:
         st.session_state.temp_mic_text = text_from_mic
         st.rerun()
+
+    # 2. Yazılı Giriş Alanı (En Altta)
+    if not prompt:
+        prompt = st.chat_input("Sorunuzu buraya yazın...")
 
 # --- 8. İŞLEM MANTIĞI ---
 if prompt:
