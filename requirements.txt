@@ -1,4 +1,6 @@
 streamlit
 google-genai
 gtts
+streamlit-mic-recorder
+
 
