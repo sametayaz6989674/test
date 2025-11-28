@@ -124,42 +124,57 @@ def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
-# --- 4. CSS STİLİ (DÜZELTİLMİŞ) ---
+# --- 4. CSS STİLİ (DÜZELTİLDİ: BOT VE KULLANICI HİZALAMASI) ---
 st.markdown("""
 <style>
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SAĞDA) */
+/* ------------------------------------------- */
+/* KULLANICI MESAJI (SAĞDA + SAĞ ÇİZGİ) */
+/* ------------------------------------------- */
 .stChatMessage:nth-child(odd) { 
-    flex-direction: row-reverse; 
+    flex-direction: row-reverse; /* İkonu ve içeriği ters çevir (Sağa yasla) */
     text-align: right; 
     background-color: #FFFFFF !important; 
+    
+    /* ÇİZGİ: Sadece Sağda */
     border-right: 5px solid #003366 !important; 
     border-left: none !important; 
+    
     border-radius: 10px 0px 10px 10px; 
 }
+/* İçerik hizalaması */
 .stChatMessage:nth-child(odd) div[data-testid="stMarkdownContainer"] {
     text-align: right !important;
+    margin-right: 10px;
 }
+/* Kullanıcı İkonu */
 .stChatMessage:nth-child(odd) [data-testid="stChatMessageAvatar-user"] {
     background-color: #708090 !important; 
     margin-left: 10px; margin-right: 0px;
 }
 
-/* ASİSTAN MESAJI (SOLDA) */
+/* ------------------------------------------- */
+/* ASİSTAN MESAJI (SOLDA + SOL ÇİZGİ) */
+/* ------------------------------------------- */
 .stChatMessage:nth-child(even) { 
-    flex-direction: row; 
+    flex-direction: row; /* Normal akış (Sola yasla) */
     text-align: left; 
     background-color: #E0EFFF !important; 
+    
+    /* ÇİZGİ: Sadece Solda */
     border-left: 5px solid #003366 !important; 
     border-right: none !important;
+    
     border-radius: 0px 10px 10px 10px; 
 }
+/* Asistan İkonu */
 .stChatMessage:nth-child(even) [data-testid="stChatMessageAvatar-assistant"] {
     background-color: #003366 !important; 
     margin-right: 10px; 
 }
 
+/* Diğer */
 .css-1v0609 { box-shadow: 0 4px 8px rgba(0, 51, 102, 0.2); border-radius: 12px; }
 .stButton>button { box-shadow: 0 2px 4px rgba(0, 51, 102, 0.1); }
 </style>
@@ -177,8 +192,7 @@ with col2:
     st.title("Altınoluk MYO Bilgisayar Programcılığı Asistanı")
     st.caption("📌 **Kullanım Amacı:** Bu Yapay Zeka Asistanı, sadece **Altınoluk MYO** ve **Bilgisayar Programcılığı Bölümü** hakkındaki verilere dayanarak cevap üretir.")
 
-# --- 6. MESAJ GEÇMİŞİNİ GÖSTER (GİRİŞTEN ÖNCE) ---
-# Düzeni düzeltmek için mesajları önce yazdırıyoruz
+# --- 6. MESAJ GEÇMİŞİNİ GÖSTER ---
 for i, message in enumerate(st.session_state.messages):
     avatar_icon = "student_icon.png" if message["role"] == "user" else "balikesir_uni_icon.png"
     
@@ -189,38 +203,46 @@ for i, message in enumerate(st.session_state.messages):
             if st.session_state.audio_button_pressed and st.session_state.last_response_index == i:
                 audio_data = generate_audio(message["content"])
                 if audio_data:
+                    # Mobil uyumluluk için audio/mpeg
                     st.audio(audio_data, format="audio/mpeg")
             
             if st.button("🔊 Sesli Dinle", key=f"play_audio_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# --- 7. GİRİŞ ALANI (SES + YAZI) (EN ALTTA) ---
+# --- 7. GİRİŞ ALANI (SES + YAZI) (EN ALTTA YAN YANA) ---
 prompt = None 
 
-# Sesli giriş kontrolü
 if st.session_state.temp_mic_text:
     prompt = st.session_state.temp_mic_text
     st.session_state.temp_mic_text = None
 
-# Giriş bileşenlerini alt alta/yan yana koymak yerine
-# Chat input'u en alta sabitliyoruz, mikrofonu hemen üstüne koyuyoruz.
+# Giriş alanlarını alt alta değil, yan yana gibi düzenlemek için
+# Mikrofonu sol sütuna, boşluğu sağa alıp, chat_input'u alta koyuyoruz.
+# Ancak kullanıcı "Sol tarafa ekleyelim" dediği için:
 with st.container():
-    st.markdown("---") # Ayırıcı çizgi
+    # Mikrofon ve Bilgilendirme için kolonlar
+    mic_col, info_col = st.columns([1, 5])
     
-    # Mikrofon butonu
-    text_from_mic = speech_to_text(
-        language='tr',
-        start_prompt="🎙️ Sesli Konuşmak İçin Tıkla",
-        stop_prompt="⏹️ Göndermek İçin Tıkla",
-        just_once=True,
-        use_container_width=True
-    )
+    with mic_col:
+        # Mikrofon butonu (Sadece ikon olarak görünür, metni kaldırdım daha şık olsun diye)
+        text_from_mic = speech_to_text(
+            language='tr',
+            start_prompt="🎙️",
+            stop_prompt="🛑",
+            just_once=True,
+            key='STT',
+            use_container_width=True
+        )
     
+    with info_col:
+        # Mikrofonun ne işe yaradığını belirten küçük bir not (opsiyonel)
+        st.caption("👈 Sesli soru sormak için mikrofona tıklayın.")
+
     if text_from_mic:
         st.session_state.temp_mic_text = text_from_mic
         st.rerun()
 
-    # Yazılı giriş (Eğer sesli giriş yoksa)
+    # Yazılı giriş (Standart yerinde)
     if not prompt:
         prompt = st.chat_input("Sorunuzu buraya yazın...")
 
@@ -229,16 +251,12 @@ if prompt:
     st.session_state.audio_button_pressed = False
     st.session_state.last_response_index = -1
     
-    # Kullanıcı mesajını geçmişe ekle
+    # Kullanıcı mesajını ekle
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    # Sayfayı hemen yenile ki kullanıcı mesajı yukarıda görünsün
-    # Bot cevabı bir sonraki render'da oluşacak ama önce kullanıcının mesajı görünsün.
-    # Ancak Streamlit akışında işlemi burada yapıp sonuca gitmek daha iyidir.
-
+    # İşleme başla
     special_content, is_special = handle_special_query(client, prompt, st.session_state.model_name, MYO_BILGI_KAYNAGI, st.session_state.messages)
 
-    # Asistan cevabını oluştur
     with st.spinner("Asistan düşünüyor..."):
         bot_response = ""
         try:
@@ -261,8 +279,7 @@ if prompt:
         except Exception as e:
             bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
 
-    # Bot cevabını geçmişe ekle
+    # Bot cevabını ekle
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
-    # Sayfayı yenile ki yeni mesajlar en altta görünsün
     st.rerun()
