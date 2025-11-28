@@ -228,6 +228,10 @@ with btn_col:
     st.button("➤", on_click=submit_click, use_container_width=True)
 
 # --- 8. İŞLEM MANTIĞI ---
+[ui]
+# Streamlit'in yan çubuğundaki (sol üst) "Streamlit" yazısını gizler
+hideSidebarContent = true
+
 
 if st.session_state.user_prompt_content:
     final_prompt = st.session_state.user_prompt_content
@@ -269,3 +273,7 @@ if final_prompt:
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     st.rerun()
+
+
+
+
