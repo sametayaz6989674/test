@@ -64,7 +64,7 @@ def handle_special_query(client, prompt, model_name, myo_kaynagi, messages):
         if len(messages) >= 2 and messages[-2]["role"] == "assistant":
             last_bot_response = messages[-2]["content"]
         
-        if last_bot_response and len(last_bot_response) > 50:
+        if last_bot_response and len(last_bot_response.replace('#', '').replace('*', '')) > 50:
             ozet_prompt = f"Kullanıcı, ona verdiğin son cevabı özetlemeni istiyor. Aşağıdaki metni kısaca özetle: \n\nMETİN: {last_bot_response}"
         else:
             ozet_prompt = f"Kullanıcı Altınoluk MYO hakkında genel bir özet istedi. Aşağıdaki metni özetle:\n\n{myo_kaynagi}"
@@ -103,15 +103,20 @@ if "messages" not in st.session_state: st.session_state.messages = []
 if "history" not in st.session_state: st.session_state.history = []
 if "last_response_index" not in st.session_state: st.session_state.last_response_index = -1
 if "audio_button_pressed" not in st.session_state: st.session_state.audio_button_pressed = False
+# Giriş yönetimi için state
 if 'user_prompt_content' not in st.session_state: st.session_state.user_prompt_content = None
+if 'processed_prompt' not in st.session_state: st.session_state.processed_prompt = None # ÇİFT MESAJ ÖNLEME
 
 def set_audio_state(index):
     st.session_state.audio_button_pressed = True
     st.session_state.last_response_index = index
 
+# Metin kutusu 'on_change' fonksiyonu
 def submit_text():
-    st.session_state.user_prompt_content = st.session_state.widget_input
-    st.session_state.widget_input = "" 
+    # Eğer input boş değilse kaydet
+    if st.session_state.widget_input:
+        st.session_state.user_prompt_content = st.session_state.widget_input
+        st.session_state.widget_input = "" # Kutuyu temizle
 
 def submit_click():
     if st.session_state.widget_input:
@@ -123,7 +128,7 @@ st.markdown("""
 <style>
 .css-1jc2h0i { visibility: hidden; }
 
-/* KULLANICI MESAJI (SOLDA + SOL ÇİZGİ) */
+/* KULLANICI MESAJI (SOLDA) */
 .stChatMessage:nth-child(odd) { 
     flex-direction: row; 
     text-align: left; 
@@ -140,7 +145,7 @@ st.markdown("""
     margin-right: 10px; 
 }
 
-/* ASİSTAN MESAJI (SOLDA + SOL ÇİZGİ) */
+/* ASİSTAN MESAJI (SOLDA) */
 .stChatMessage:nth-child(even) { 
     flex-direction: row; 
     text-align: left; 
@@ -154,6 +159,7 @@ st.markdown("""
     margin-right: 10px; 
 }
 
+/* BUTONLAR */
 .stButton>button { box-shadow: 0 2px 4px rgba(0, 51, 102, 0.1); }
 </style>
 """, unsafe_allow_html=True)
@@ -186,15 +192,16 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("🔊 Sesli Dinle", key=f"play_{i}", on_click=set_audio_state, args=(i,)):
                 pass 
 
-# --- 7. GİRİŞ ALANI (YAN YANA MİKROFON VE METİN) ---
+# --- 7. GİRİŞ ALANI (YAN YANA DÜZEN) ---
 st.markdown("---") 
 
 final_prompt = None
 
-# Yan yana kolonlar: %15 Mikrofon, %75 Yazı alanı, %10 Gönder
-mic_col, text_col, btn_col = st.columns([1.5, 7.5, 1])
+# Yan yana 3 kolon: Mikrofon (%10), Yazı Alanı (%80), Gönder Butonu (%10)
+mic_col, text_col, btn_col = st.columns([1, 8, 1])
 
 with mic_col:
+    # Mikrofon butonu
     text_from_mic = speech_to_text(
         language='tr',
         start_prompt="🎙️",
@@ -205,6 +212,7 @@ with mic_col:
     )
 
 with text_col:
+    # Yazı alanı (Enter'a basınca 'submit_text' çalışır)
     st.text_input(
         label="Mesajınızı yazın",
         placeholder="Sorunuzu buraya yazın...", 
@@ -216,21 +224,29 @@ with text_col:
 with btn_col:
     st.button("➤", on_click=submit_click, use_container_width=True)
 
-# --- 8. İŞLEM MANTIĞI ---
+# --- 8. İŞLEM MANTIĞI (DÜZELTİLMİŞ) ---
 
+# Giriş kaynaklarını kontrol et
 if st.session_state.user_prompt_content:
     final_prompt = st.session_state.user_prompt_content
-    st.session_state.user_prompt_content = None 
+    st.session_state.user_prompt_content = None # Temizle
 
 elif text_from_mic:
     final_prompt = text_from_mic
 
-if final_prompt:
+# HATA DÜZELTMESİ: Aynı mesajın tekrar işlenmesini engelle
+# Eğer final_prompt varsa VE bu prompt daha önce işlenmemişse işle
+if final_prompt and final_prompt != st.session_state.processed_prompt:
+    
+    # İşlenen prompt'u kaydet (tekrarı önlemek için)
+    st.session_state.processed_prompt = final_prompt
+    
     st.session_state.audio_button_pressed = False
     st.session_state.last_response_index = -1
     
     st.session_state.messages.append({"role": "user", "content": final_prompt})
     
+    # Özel sorgu kontrolü
     special_content, is_special = handle_special_query(client, final_prompt, st.session_state.model_name, MYO_BILGI_KAYNAGI, st.session_state.messages)
 
     with st.spinner("Asistan düşünüyor..."):
@@ -250,10 +266,12 @@ if final_prompt:
                 bot_response = response.text
                 st.session_state.history = current_chat.get_history()
 
+        except google.genai.errors.ClientError as e: # Client error yakalama
+             bot_response = f"**⚠️ İstemci Hatası:** İsteğinizle ilgili bir sorun oluştu. Lütfen tekrar deneyin. ({e})"
         except google.genai.errors.ServerError as e:
             bot_response = f"**⚠️ Üzgünüm, API çok yoğun!** Lütfen 10 saniye bekleyip tekrar deneyin. ({e.status_code})"
         except Exception as e:
-            bot_response = f"Üzgünüm, mesaj gönderilirken bir hata oluştu: {e}"
+            bot_response = f"Üzgünüm, beklenmedik bir hata oluştu: {e}"
 
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
