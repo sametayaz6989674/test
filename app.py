@@ -15,25 +15,71 @@ st.set_page_config(
     layout="centered" 
 )
 
-# --- 1. ÖZEL BİLGİ KAYNAĞI ---
+# --- 1. ÖZEL BİLGİ KAYNAĞI (TAM VE EKSİKSİZ HALİ) ---
 MYO_BILGI_KAYNAGI = """
 ### ALTINOLUK MESLEK YÜKSEKOKULU BİLGİ BANKASI ###
+
 * **Bölümler:** Altınoluk MYO'da toplam **3 bölüm** bulunmaktadır: Bilgisayar Programcılığı, Bitkisel ve Hayvansal Üretim Bölümü, ve Kimya ve Kimyasal İşleme Teknolojileri Bölümü.
-* **Program:** Bilgisayar Programcılığı, 2 yıllık (4 dönem) ön lisans programıdır. hepsi böyledir altınoluk bir Meslek YüksekOkulu'dur 
-* **Ders İçeriği:** Temel olarak **Algoritma ve Programlama (algoritmaya giriş, başlangıç seviyesinde kod yazma bilgisi temel bilgiler)**, Web Tasarımı (HTML/CSS/JavaScript), Veritabanı Yönetimi ve Nesne Tabanlı Programlama (Java/C#) konularına odaklanır. Ağ sistemleri dersinde ağ toplojisi switch hub tarzı kavramlar temel digital elektornik dersinde devre elemanları kullanım amaçları kullanım yerleri devre elemanları ne için kullanılır temel düzeyde bilgi ofis programları güncel ofis programları world,excel,powerpoint Acccess database tarzı uygulamalar ve temel düzeyde bilgi geri kalan dersler hakkında güncel müfredata uygun dersler işlenmektedir yada bu dersler hakkında araştırma yapıp yazabilirsin sorulan soruyu cevapsız bırakma.
-* **Eğitmen Kadrosu:** Bilgisayar programcılığı bölümündeki öğretim üyeleri Gönüllülük Çalışmaları Dersine Cenk Paşa girmekte aynı zamanda İletişim dersine de giriyor. Atatürk ilkeleri ve inklap tarihi dersine Uğur yıldırım girmekte. İngilizce dersine Gamze Yavaş Çelik Girmekte. Algoritma ve Programlama Temelleri dersine Ali ERFİDAN girmekte. Ağ yönetimi ve Bilgi güvenliği dersine Emre Selman CANIAZ girmekte aynı zamanda Temel ve Digital Elektronik dersine de girmekte. Türk Dili dersine Gülfiye Bulut girmekte. Ofis yazılımları dersine Aykut DURGUT girmekte Matematik I dersine Tuğba KÜÇÜKSEYHAN girmekte aynı zamanda bu dersler Bilgisayar Programcılığı 1.sınıfın gördüğü tüm derslerdir. tüm dersler müfredata uygun ilerlemektedir. akademisyenlerimizin hepsi güleryüzlü neşeli işini seven öğrencilerini seven değer veren kişilerdir.
+
+* **Program:** Bilgisayar Programcılığı, 2 yıllık (4 dönem) ön lisans programıdır. hepsi böyledir altınoluk bir Meslek YüksekOkulu'dur.
+
+* **Ders İçeriği:** Temel olarak **Algoritma ve Programlama (algoritmaya giriş, başlangıç seviyesinde kod yazma bilgisi temel bilgiler)**, Web Tasarımı (HTML/CSS/JavaScript), Veritabanı Yönetimi ve Nesne Tabanlı Programlama (Java/C#) konularına odaklanır. Ağ sistemleri dersinde ağ toplojisi switch hub tarzı kavramlar, temel digital elektronik dersinde devre elemanları kullanım amaçları kullanım yerleri devre elemanları ne için kullanılır temel düzeyde bilgi, ofis programları güncel ofis programları word, excel, powerpoint, Access database tarzı uygulamalar ve temel düzeyde bilgi. Geri kalan dersler hakkında güncel müfredata uygun dersler işlenmektedir.
+
+* **Eğitmen Kadrosu:** * Gönüllülük Çalışmaları ve İletişim dersine Cenk Paşa girmekte.
+    * Atatürk ilkeleri ve inkılap tarihi dersine Uğur Yıldırım girmekte.
+    * İngilizce dersine Gamze Yavaş Çelik Girmekte.
+    * Algoritma ve Programlama Temelleri dersine Ali ERFİDAN girmekte.
+    * Ağ yönetimi ve Bilgi güvenliği ile Temel ve Digital Elektronik dersine Emre Selman CANIAZ girmekte.
+    * Türk Dili dersine Gülfiye Bulut girmekte.
+    * Ofis yazılımları dersine Aykut DURGUT girmekte.
+    * Matematik I dersine Tuğba KÜÇÜKSEYHAN girmekte.
+    * Akademisyenlerimizin hepsi güleryüzlü, neşeli, işini seven, öğrencilerini seven ve değer veren kişilerdir.
+
+* **Öğretmen İletişim Bilgileri:**
+    * Tuğba Küçükseyhan: kucukseyhan@balikesir.edu.tr
+    * Emre Selman CANIAZ: escaniaz@balikesir.edu.tr
+    * Aykut Durgut: adurgut@balikesir.edu.tr
+    * Cenk Paşa: cpasa@balikesir.edu.tr
+    * Ali Erfidan: ali.erfidan@balikesir.edu.tr
+
 * **Kariyer Fırsatları:** Mezunlar Junior Yazılımcı, Veri Analizi Asistanı, Teknik Destek Uzmanı ve Front-end Geliştirici olarak özel sektörde iş bulabilmektedir.
+
 * **Staj Durumu:** Tüm öğrencilerin 3. ve 4. yarıyıl arasında **zorunlu 30 iş günü staj** yapma yükümlülüğü vardır.
+
 * **Okul İklimi:** Öğrenci yorumlarına göre okul samimi, küçük ve eğitmenler birebir ilgi gösterebilmektedir.
-* **Okul Eğlence Hobi Yemek:** Okulumuzun Yemekhanesi mevcuttur öğrenciler 40 TL karşlığında yemek yiyebilir. Okulumuzda kantin mevcuttur voleybol sahası vardır öğrencilerin masa tenisi oynayabileceği alan mevcuttur. okulumuzun kütüphanesi mevcuttur ders çalışmak için veya araştırma yapmak için öğrenciler kullanabilir. okul bahçesi güvenlidir her saat güvenlik kapıda beklemektedir. öğrencilere öğrenci kartı verilmektedir(sınavlarda öğrenci kartları masalara koyulur) okulumuzun konferans salonu mevcuttur 
-* **Akademik Takvim:** [Akademik takvim detayları korunmuştur.]
-* **İdari Kadro:** Ersin KOCABIYIK Yüksekokul Sekreteri, Fatma ÖZKUL Şef, Hüseyin Çağrı ÖZSU Bilgisayar İşletmeni, Emre Selman CANIAZ Bilgisayar Programcılığı Danışmanı,
-* **Okul iletişim:**Adres: İskele, Atatürk Cd. No:103, 10870 Edremit/Balıkesir okulun tam adresi bu ve Telefon: (0266) 396 15 52 hafta için 08.00 17.00 arası açık hafta sonu kapalı.
-* **Altınoluk Meslek Yüksek Okulu Müdür:** [Müdür konuşması korunmuştur.]
-* **Altınoluk Meslek Yüksek Okulu imkanları:** [İmkan detayları korunmuştur.]
-* **Bu okul hakkında bilgi ver:** [Genel okul bilgileri korunmuştur.]
-* **Bilgisayar Programcılığı bölümü hakkında:** [Bölüm detayları korunmuştur.]
-* **Altınoluk nasıl bir yer altınoluk hakkında bilgi:** [Altınoluk bölge bilgisi korunmuştur.]
+
+* **Okul Eğlence, Hobi ve Yemek:** Okulumuzun Yemekhanesi mevcuttur öğrenciler 40 TL karşlığında yemek yiyebilir. Okulumuzda kantin mevcuttur, voleybol sahası vardır, öğrencilerin masa tenisi oynayabileceği alan mevcuttur. Okulumuzun kütüphanesi mevcuttur ders çalışmak için veya araştırma yapmak için öğrenciler kullanabilir. Okul bahçesi güvenlidir her saat güvenlik kapıda beklemektedir. Öğrencilere öğrenci kartı verilmektedir (sınavlarda öğrenci kartları masalara koyulur). Okulumuzun konferans salonu mevcuttur.
+
+* **İdari Kadro:** Ersin KOCABIYIK (Yüksekokul Sekreteri), Fatma ÖZKUL (Şef), Hüseyin Çağrı ÖZSU (Bilgisayar İşletmeni), Emre Selman CANIAZ (Bilgisayar Programcılığı Danışmanı), Okul Müdürü Dr. Öğr. Üyesi Sakin Vural Varlı.
+
+* **Okul İletişim ve Detaylar:** * Adres: İskele, Atatürk Cd. No:103, 10870 Edremit/Balıkesir. 
+    * Telefon: (0266) 396 15 52. 
+    * Çalışma Saatleri: Hafta içi 08.00 - 17.00 arası açık, hafta sonu kapalı.
+    * Toplam Öğrenci Sayısı: 352.
+    * Geçme Notu: Vizenin %40'ı, finalin %60'ı alınır. Finalden kesinlikle 50 ve üstü not almanız gerekmektedir. Ortalama 45 ve üstü ise dersi geçersiniz. Çan eğrisi yoktur.
+    * Konaklama: Öğrenciler apart, kiralık daire veya Edremit'teki KYK yurtlarında kalmaktadır.
+    * Puan Bilgileri (2025 YÖKATLAS): TYT Giriş Puanı 317,14553. Başarı sırası 662.855. Ortalama diploma notu 77.8.
+
+* **Akademik Takvim:** * 01 Eylül 2025: Azami Süre Sonu Sınav İlanı
+    * 04-05 Eylül 2025: 1. Ek Sınavlar
+    * 11-12 Eylül 2025: 2. Ek Sınavlar
+    * 17-19 Eylül 2025: Güz Yarıyılı Ders Kayıtları
+    * 22 Eylül 2025 - 09 Ocak 2026: GÜZ YARIYILI
+    * 10-18 Kasım 2025: Ara Sınav Haftası
+    * 12-23 Ocak 2026: Yarıyıl Sonu Sınavları (Final)
+    * 02-06 Şubat 2026: Bütünleme Sınavları
+    * 16 Şubat - 16 Haziran 2026: BAHAR YARIYILI
+    * 06-14 Nisan 2026: Ara Sınav Haftası
+    * 17-30 Haziran 2026: Yarıyıl Sonu Sınavları
+    * 08-14 Temmuz 2026: Bütünleme Sınavları
+
+* **Altınoluk Meslek Yüksek Okulu Müdür Mesajı (Sakin Vural VARLI):** Balıkesir Üniversitesi Altınoluk Meslek Yüksekokulu, 2007 yılından bu yana zengin doğal güzellikleriyle dikkat çeken, zeytin ağaçlarıyla çevrili ve Kazdağları’nın eteğinde yer alan Altınoluk’ta eğitim-öğretim faaliyetlerini sürdürmektedir. Genç ve dinamik akademik kadrosuyla yüksekokulumuz, Bilgisayar Programcılığı, Tıbbi ve Aromatik Bitkiler Programı ve Kimya Teknolojileri Programı olmak üzere üç örgün programda eğitim vermektedir. Hedefimiz, bilgi ve teknoloji üreten, doğa ve çevre bilinci gelişmiş, toplumsal değerleri önemseyen, araştırmacı ve çağdaş bir öğretim kültürünü benimsemiş bireyler yetiştirmektir. Öğrencilerimizi, yalnızca akademik bilgiyle değil, aynı zamanda iş dünyasında sorumluluk alabilen, yenilikçi ve üretken bireyler olarak hayata hazırlıyoruz. Bu doğrultuda, üniversite-sanayi-toplum iş birliğini esas alarak, yaşadığımız kentin kalkınmasına katkıda bulunacak, ülkemizin sorunlarına duyarlı ve sosyal sorumluluk bilinci yüksek mezunlar yetiştirmeyi amaçlıyoruz. Altınoluk Meslek Yüksekokulu olarak, Atatürk ilke ve inkılaplarını rehber edinen; çağın gerektirdiği bilgi, beceri ve teknolojik gelişmelere uyum sağlayan; uluslararası platformlarda aranılan niteliklere sahip bireyler yetiştirme gayretiyle çalışmalarımızı sürdürüyoruz. Güzel ülkemizin aydınlık yarınlarını inşa edecek olan siz değerli gençlerimizi, Altınoluk Meslek Yüksekokulu ailesine katılmaya davet ediyoruz.
+
+* **Altınoluk Meslek Yüksek Okulu İmkanları:** Bilgi ve teknoloji üreten, toplumsal değerleri önemseyen, doğa ve çevre bilinci gelişmiş, araştırmacı ve çağdaş bir öğretim kültürü ile topluma liderlik yapabilecek bireyler yetiştirmektir. Yüksekokul binasında 11 derslik, 1 bilgisayar, 1 kimya, 1 botanik laboratuarının yanı sıra bir kapalı spor salonu bulunmaktadır.
+
+* **Genel Bilgi:** Altınoluk Meslek Yüksekokulu, Balıkesir Üniversitesi’ne bağlı, 2007 yılında kurulan ve Edremit Körfezi’nde yer alan bir önlisans eğitim kurumudur. Doğayla iç içe kampüsü, modern laboratuvarları ve deneyimli akademik kadrosu ile öğrencilerine hem teorik hem de uygulamalı eğitim sunar.
+
+* **Altınoluk Hakkında:** Altınoluk, Edremit Körfezi’nin incisi olarak, hem deniz hem doğa tutkunlarını kendine çeker. Kaz Dağları’nın eteklerinde yer alan bu sahil kasabası, yemyeşil zeytinlikler ve çam ormanlarıyla çevrilidir. Yazları sıcak ve güneşli, kışları ise ılık geçen iklimiyle yılın her dönemi ziyaretçilerini ağırlayabilir. Tarihi dokusu, Rum ve Osmanlı izleri taşıyan yapıları ve leziz yerel mutfağıyla Altınoluk, huzurlu bir tatil deneyimi sunar.
 """
 
 # --- 1.5. ÖZEL GÖREV FONKSİYONLARI ---
@@ -242,3 +288,4 @@ if prompt:
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     st.rerun()
+
