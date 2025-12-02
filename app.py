@@ -59,6 +59,8 @@ MYO_BILGI_KAYNAGI = """
     * Geçme Notu: Vizenin %40'ı, finalin %60'ı alınır. Finalden kesinlikle 50 ve üstü not almanız gerekmektedir. Ortalama 45 ve üstü ise dersi geçersiniz. Çan eğrisi yoktur.
     * Konaklama: Öğrenciler apart, kiralık daire veya Edremit'teki KYK yurtlarında kalmaktadır.
     * Puan Bilgileri (2025 YÖKATLAS): TYT Giriş Puanı 317,14553. Başarı sırası 662.855. Ortalama diploma notu 77.8.
+    * okulumuzun website adresi https://altinolukmyo.balikesir.edu.tr/ bu adres üzerinden  akademik takvim detaylarına okul duyurularına bakabilirsiniz.
+    * https://obs.balikesir.edu.tr/ okulun obs(öğrenci bilgi sistemidir)  ders programı, ilan edilen notlara bakabilirsiniz. öğrenci mailinize iletişim bilgilerine bakabilirsiniz
 
 * **Akademik Takvim:** * 01 Eylül 2025: Azami Süre Sonu Sınav İlanı
     * 04-05 Eylül 2025: 1. Ek Sınavlar
@@ -288,4 +290,5 @@ if prompt:
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     
     st.rerun()
+
 
